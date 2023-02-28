@@ -1,0 +1,16 @@
+[22:59:44] [info] TOY2D: toy2d start
+[22:59:44] [info] TOY2D: creating window ZeroEngine (1280, 720)
+[22:59:44] [info] TOY2D: -------------------------------
+[22:59:44] [info] TOY2D: begin to register render pass: 
+[22:59:44] [info] TOY2D: -- MainCameraPass2D register success.
+[22:59:44] [info] TOY2D: -- UIPass register success.
+[22:59:44] [info] TOY2D: register render pass success!
+[22:59:44] [info] TOY2D: -------------------------------
+[22:59:44] [info] TOY2D: dx12 render_context init success
+[22:59:44] [info] TOY2D: register texture named white success!
+[22:59:44] [info] TOY2D: register mesh named square success!
+[22:59:44] [trace] TOY2D: attach
+[22:59:44] [info] TOY2D: register texture named asoul_moon success!
+[22:59:44] [info] TOY2D: register texture named bella success!
+[22:59:45] [info] TOY2D: toy2d shutdown
+[22:59:45] [trace] TOY2D: detach
