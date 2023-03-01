@@ -12,16 +12,16 @@ void Toy2D::Physics2DManager::resetWorld() {
     m_world = CreateScope<b2World>(gravity);
 }
 
-b2Body* Toy2D::Physics2DManager::createBody(int entity_id, float x, float y, float rotation, bool is_dynamic, bool is_kinematic, CollisionShape2D* shape2d) {
+b2Body* Toy2D::Physics2DManager::createBody(int entity_id, float x, float y, float rotation, bool is_dynamic, bool is_kinematic, CollisionShape2D& shape2d) {
     b2BodyDef body_def{};
     body_def.position.Set(x, y);
     body_def.angle = rotation;
     b2FixtureDef fixture_def{};
-    ASSERT(shape2d != nullptr, "You should create a shape for a rigidbody!");
-    if (shape2d == nullptr) {
+    ASSERT(shape2d.m_b2shape.get() != nullptr, "You should create a shape for a rigidbody!");
+    if (shape2d.m_b2shape.get() == nullptr) {
         return nullptr;
     }		
-    fixture_def.shape = shape2d->m_b2shape.get();
+    fixture_def.shape = shape2d.m_b2shape.get();
     if (is_dynamic) {
         body_def.type = b2_dynamicBody;
         fixture_def.density = 1.0f;

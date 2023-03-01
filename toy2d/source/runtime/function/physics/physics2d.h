@@ -11,7 +11,7 @@ namespace Toy2D {
     public:
         Physics2DManager();
         void        resetWorld();
-        b2Body* createBody(int entity_id, float x, float y, float rotation, bool is_dynamic, bool is_kinematic, CollisionShape2D* shape2d);
+        b2Body* createBody(int entity_id, float x, float y, float rotation, bool is_dynamic, bool is_kinematic, CollisionShape2D& shape2d);
         ~Physics2DManager();
         using Transform2D = std::tuple<float, float, float>;
         Transform2D getTransform(void* runtime_body);

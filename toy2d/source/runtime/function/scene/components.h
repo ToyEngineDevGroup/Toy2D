@@ -79,7 +79,7 @@ namespace Toy2D {
 
         // Storage for runtime
         void* runtime_body{nullptr};
-        CollisionShape2D* shape{nullptr};
+        CollisionShape2D shape;
 
         Rigidbody2DComponent()                            = default;
         Rigidbody2DComponent(const Rigidbody2DComponent&) = default;
@@ -90,7 +90,7 @@ namespace Toy2D {
         float   a_velocity;
 
         void setAsRectange(float w, float h) {
-            shape = CollisionShape2D::createBox(w, h);
+            shape.createBox(w, h);
         }
 
         void setVelocity(float v_x, float v_y) {

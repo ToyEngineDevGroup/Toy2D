@@ -7,7 +7,7 @@ namespace Toy2D{
     class CollisionShape2D {
     public:
         CollisionShape2D();
-        static CollisionShape2D* createBox(float w, float h);
+        void createBox(float w, float h);
         Scope<b2Shape> m_b2shape;
     };
 };
