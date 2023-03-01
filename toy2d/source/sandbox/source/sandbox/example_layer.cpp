@@ -17,11 +17,18 @@ void ExampleLayer::onAttach() {
     player.addComponent<Toy2D::CameraComponent>().camera.setOrthographicSize(5.0f);
     player.addComponent<Toy2D::SpriteComponent>().tex_index =
         Toy2D::Application::get().getResourceMngr()->index<Toy2D::ResourceType::Texture>("bella");
-    player.addComponent<Toy2D::NativeScriptComponent>().bind<CameraController>();
+    player.addComponent<Toy2D::NativeScriptComponent>().bind<PlayerController>();
+    auto& rigidbody = player.addComponent<Toy2D::Rigidbody2DComponent>();
+    rigidbody.type   = Toy2D::Rigidbody2DComponent::BodyType::Dynamic;
+    rigidbody.setAsRectange(0.5f, 0.5f);
 
     auto&& square = m_world.getActiveScene()->createEntity("square");
     square.addComponent<Toy2D::SpriteComponent>();
     square.addComponent<Toy2D::NativeScriptComponent>().bind<TexMarchingScript>();
+    square.addComponent<Toy2D::Rigidbody2DComponent>().setAsRectange(1.0f, 1.0f);
+    auto& transform = square.getComponent<Toy2D::TransformComponent>();
+    transform.translation.y = -1.5f;
+    transform.rotation.z    = 0.3f;
 
     // Toy2D::SceneSerializer serializer(m_world.getActiveScene());
     // serializer.deserialize(Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "scene/scene.json");
@@ -46,7 +53,7 @@ void ExampleLayer::onImGuiRender() {
         LOG_INFO("Button Clicked");
         });
 
-    Toy2D::Widgets::drawText("Hello world");
+    Toy2D::Widgets::drawText("Move with W,A,S,D. Have a try!!!");
 }
 
 void ExampleLayer::onEvent(Toy2D::Event& event) {

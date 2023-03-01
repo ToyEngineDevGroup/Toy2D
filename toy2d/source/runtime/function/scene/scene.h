@@ -4,6 +4,7 @@
 
 #include "runtime/core/util/time_step.h"
 #include "runtime/function/render/camera_system/editor_camera.h"
+#include <runtime/function/physics/physics2d.h>
 
 class b2World;
 
@@ -43,6 +44,7 @@ namespace Toy2D {
         uint32_t       m_viewport_width{0};
         uint32_t       m_viewport_height{0};
 
-        b2World* m_physics_world{nullptr};
+        Scope<Physics2DManager> m_physics2d_manager;
+        std::list<entt::entity> m_submit_body_creation;
     };
 } // namespace Toy2D

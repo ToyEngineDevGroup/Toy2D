@@ -11,17 +11,40 @@ public:
     }
 
     void onUpdate(Toy2D::TimeStep timestep) override {
-        auto& transform = getComponent<Toy2D::TransformComponent>().translation;
+        auto& transform = getComponent<Toy2D::TransformComponent>();
         float speed     = 3.0f;
 
         if (Toy2D::InputSystem::isKeyPressed('A'))
-            transform.x -= speed * timestep;
+            transform.translation.x -= speed * timestep;
         if (Toy2D::InputSystem::isKeyPressed('D'))
-            transform.x += speed * timestep;
+            transform.translation.x += speed * timestep;
         if (Toy2D::InputSystem::isKeyPressed('W'))
-            transform.y += speed * timestep;
+            transform.translation.y += speed * timestep;
         if (Toy2D::InputSystem::isKeyPressed('S'))
-            transform.y -= speed * timestep;
+            transform.translation.y -= speed * timestep;
+    }
+};
+
+class PlayerController : public Toy2D::ScriptableEntity {
+public:
+    void onCreate() override {
+    }
+
+    void onDestroy() override {
+    }
+
+    void onUpdate(Toy2D::TimeStep timestep) override {
+        auto& rigidbody2d = getComponent<Toy2D::Rigidbody2DComponent>();
+        float speed     = 3.0f;
+
+        if (Toy2D::InputSystem::isKeyPressed('A'))
+            rigidbody2d.setVelocity(-2.5f, 0.0f);
+        if (Toy2D::InputSystem::isKeyPressed('D'))
+            rigidbody2d.setVelocity(2.5f, 0.0f);
+        if (Toy2D::InputSystem::isKeyPressed('W'))
+            rigidbody2d.setVelocity(0.0f, 2.5f);
+        if (Toy2D::InputSystem::isKeyPressed('S'))
+            rigidbody2d.setVelocity(0.0f, -2.5f);
     }
 };
 

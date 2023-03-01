@@ -10,7 +10,7 @@
 #define ASSERT(statement, msg)
 #else
 #define ASSERT(statement, msg) \
-    if (!statement) { \
+    if (!(statement)) { \
         LOG_ERROR("{0}", msg); \
         __debugbreak(); \
     }

@@ -3,6 +3,7 @@
 #include "runtime/core/util/time_step.h"
 #include "runtime/function/scene/scene_camera.h"
 #include "runtime/function/scene/scriptable_entity.h"
+#include "runtime/function/physics/collision_shape2d.h"
 
 namespace Toy2D {
     struct NameComponent {
@@ -78,9 +79,26 @@ namespace Toy2D {
 
         // Storage for runtime
         void* runtime_body{nullptr};
+        CollisionShape2D* shape{nullptr};
 
         Rigidbody2DComponent()                            = default;
         Rigidbody2DComponent(const Rigidbody2DComponent&) = default;
+
+        bool submit_transform_change{false};
+        bool submit_velocity_change{false};
+        Vector2 velocity{0.0f, 0.0f};
+        float   a_velocity;
+
+        void setAsRectange(float w, float h) {
+            shape = CollisionShape2D::createBox(w, h);
+        }
+
+        void setVelocity(float v_x, float v_y) {
+            velocity.x = v_x;
+            velocity.y = v_y;
+            submit_velocity_change = true;
+        }
+
     };
 
 } // namespace Toy2D
