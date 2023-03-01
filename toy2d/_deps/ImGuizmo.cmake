@@ -12,4 +12,5 @@ add_library(ImGuizmo STATIC
 
 target_include_directories(ImGuizmo PUBLIC ${ImGuizmo_SOURCE_DIR_})
 
+find_package(imgui CONFIG REQUIRED)
 target_link_libraries(ImGuizmo PUBLIC imgui)
