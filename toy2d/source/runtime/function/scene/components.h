@@ -3,6 +3,7 @@
 #include "runtime/core/util/time_step.h"
 #include "runtime/function/scene/scene_camera.h"
 #include "runtime/function/scene/scriptable_entity.h"
+#include "runtime/resource/resource/tile_sheet.h"
 
 namespace Toy2D {
     struct NameComponent {
@@ -43,6 +44,18 @@ namespace Toy2D {
             color(_color), tex_index(_tex_index), tiling_factor(_tiling_factor) {}
     };
 
+    struct TileComponent {
+        Tile  tile;
+        Color color{1.0f, 1.0f, 1.0f, 1.0f};
+
+        TileComponent()                     = default;
+        TileComponent(const TileComponent&) = default;
+        TileComponent(Resource<ResourceType::TileSheet>* tile_sheet,
+                      const Vector2&                     coords,
+                      const Vector2&                     tile_size = {1.0f, 1.0f}) :
+            tile(tile_sheet, coords, tile_size) {}
+    };
+
     struct CameraComponent {
         SceneCamera camera;
         bool        is_current{true};
@@ -66,21 +79,4 @@ namespace Toy2D {
             destroyScript     = [](NativeScriptComponent* nsc) { delete nsc->instance; nsc->instance = nullptr; };
         }
     };
-
-    // physics
-    struct Rigidbody2DComponent {
-        enum class BodyType { Static = 0,
-                              Dynamic,
-                              Kinematic };
-
-        BodyType type{BodyType::Static};
-        bool     is_fixed_rotation{false};
-
-        // Storage for runtime
-        void* runtime_body{nullptr};
-
-        Rigidbody2DComponent()                            = default;
-        Rigidbody2DComponent(const Rigidbody2DComponent&) = default;
-    };
-
 } // namespace Toy2D

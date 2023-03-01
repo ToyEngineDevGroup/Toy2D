@@ -4,10 +4,12 @@
 void ExampleLayer::onAttach() {
     LOG_TRACE("attach");
 
+    Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::TileSheet>(
+        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tilesheet/tilesheet.json");
     Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
-        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "texture/asoul_moon.png");
+        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/asoul_desc.json");
     Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
-        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "texture/bella.png");
+        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/bella_desc.json");
 
     m_world.addScene("main").setActiveScene("main").onResize(
         Toy2D::Application::get().getWindow()->getWidth(),
@@ -18,10 +20,17 @@ void ExampleLayer::onAttach() {
     player.addComponent<Toy2D::SpriteComponent>().tex_index =
         Toy2D::Application::get().getResourceMngr()->index<Toy2D::ResourceType::Texture>("bella");
     player.addComponent<Toy2D::NativeScriptComponent>().bind<CameraController>();
+    player.getComponent<Toy2D::TransformComponent>().translation.z -= 0.1f;
 
     auto&& square = m_world.getActiveScene()->createEntity("square");
     square.addComponent<Toy2D::SpriteComponent>();
     square.addComponent<Toy2D::NativeScriptComponent>().bind<TexMarchingScript>();
+
+    auto&& tile = m_world.getActiveScene()->createEntity("tile");
+    tile.addComponent<Toy2D::TileComponent>(
+        Toy2D::Application::get().getResourceMngr()->get<Toy2D::ResourceType::TileSheet>("tilesheet"),
+        Vector2{0, 3});
+    tile.getComponent<Toy2D::TransformComponent>().translation.x += 3.0f;
 
     // Toy2D::SceneSerializer serializer(m_world.getActiveScene());
     // serializer.deserialize(Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "scene/scene.json");

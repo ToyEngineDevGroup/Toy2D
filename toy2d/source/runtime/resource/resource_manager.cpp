@@ -78,6 +78,7 @@ namespace Toy2D {
         m_managers.emplace(ResourceType::Texture, CreateScope<TResourceManager<ResourceType::Texture>>());
         m_managers.emplace(ResourceType::Mesh, CreateScope<TResourceManager<ResourceType::Mesh>>());
         m_managers.emplace(ResourceType::Animation, CreateScope<TResourceManager<ResourceType::Animation>>());
+        m_managers.emplace(ResourceType::TileSheet, CreateScope<TResourceManager<ResourceType::TileSheet>>());
     }
 
     void ResourceManager::tick() {

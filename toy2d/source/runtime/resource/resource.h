@@ -5,8 +5,8 @@ namespace Toy2D {
         Unknown,
         Texture,
         Mesh,
+        TileSheet,
         Animation,
-        TileSheet
     };
 
     class IResource {
@@ -17,10 +17,11 @@ namespace Toy2D {
         std::string_view getName() const;
         size_t           getUUID() const;
 
-        virtual bool validate() const { return true; }
+        virtual bool validate() const { return m_is_valid; }
 
     protected:
         std::string m_name;
+        bool        m_is_valid{false};
     };
 
     template <ResourceType Type>
