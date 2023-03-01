@@ -6,6 +6,7 @@ namespace Toy2D {
         Texture,
         Mesh,
         Animation,
+        TileSheet
     };
 
     class IResource {
