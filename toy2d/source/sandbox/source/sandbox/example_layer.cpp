@@ -4,10 +4,12 @@
 void ExampleLayer::onAttach() {
     LOG_TRACE("attach");
 
+    Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::TileSheet>(
+        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tilesheet/tilesheet.json");
     Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
-        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "texture/asoul_moon.png");
+        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/asoul_desc.json");
     Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
-        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "texture/bella.png");
+        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/bella_desc.json");
 
     m_world.addScene("main").setActiveScene("main").onResize(
         Toy2D::Application::get().getWindow()->getWidth(),
@@ -29,6 +31,12 @@ void ExampleLayer::onAttach() {
     auto& transform = square.getComponent<Toy2D::TransformComponent>();
     transform.translation.y = -1.5f;
     transform.rotation.z    = 0.3f;
+
+    auto&& tile = m_world.getActiveScene()->createEntity("tile");
+    tile.addComponent<Toy2D::TileComponent>(
+        Toy2D::Application::get().getResourceMngr()->get<Toy2D::ResourceType::TileSheet>("tilesheet"),
+        Vector2{0, 3});
+    tile.getComponent<Toy2D::TransformComponent>().translation.x += 3.0f;
 
     // Toy2D::SceneSerializer serializer(m_world.getActiveScene());
     // serializer.deserialize(Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "scene/scene.json");

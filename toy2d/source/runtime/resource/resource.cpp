@@ -13,4 +13,5 @@ namespace Toy2D {
     template class Resource<ResourceType::Mesh>;
     template class Resource<ResourceType::Texture>;
     template class Resource<ResourceType::Animation>;
+    template class Resource<ResourceType::TileSheet>;
 } // namespace Toy2D

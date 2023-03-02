@@ -4,6 +4,7 @@
 #include "runtime/function/scene/scene_camera.h"
 #include "runtime/function/scene/scriptable_entity.h"
 #include "runtime/function/physics/collision_shape2d.h"
+#include "runtime/resource/resource/tile_sheet.h"
 
 namespace Toy2D {
     struct NameComponent {
@@ -42,6 +43,18 @@ namespace Toy2D {
         SpriteComponent(const SpriteComponent&) = default;
         SpriteComponent(const Color& _color, uint32_t _tex_index = 0, float _tiling_factor = 1.0f) :
             color(_color), tex_index(_tex_index), tiling_factor(_tiling_factor) {}
+    };
+
+    struct TileComponent {
+        Tile  tile;
+        Color color{1.0f, 1.0f, 1.0f, 1.0f};
+
+        TileComponent()                     = default;
+        TileComponent(const TileComponent&) = default;
+        TileComponent(Resource<ResourceType::TileSheet>* tile_sheet,
+                      const Vector2&                     coords,
+                      const Vector2&                     tile_size = {1.0f, 1.0f}) :
+            tile(tile_sheet, coords, tile_size) {}
     };
 
     struct CameraComponent {

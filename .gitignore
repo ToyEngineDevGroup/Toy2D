@@ -5,6 +5,8 @@ bin/
 lib/
 log/
 
+toy2d/source/test
+
 docs/zeroengine-design/.obsidian
 
 zeroengine.log

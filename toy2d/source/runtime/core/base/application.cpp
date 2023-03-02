@@ -35,7 +35,7 @@ namespace Toy2D {
 
     void Application::preLoadResources() {
         m_resource_manager->add<ResourceType::Texture>(
-            m_config_manager->getAssetFolder() / "texture/white.png");
+            m_config_manager->getAssetFolder() / "desc/tex/white_desc.json");
 
         VertexData2D vertices_square[] = {
             {{-0.5f, -0.5f, 0.0f}, {0.0f, 1.0f}},
@@ -45,9 +45,7 @@ namespace Toy2D {
         };
         uint32_t indices_square[] = {0, 3, 1, 3, 2, 1};
 
-        static VertexBufferLayout               layout;
-        static std::vector<rtti::Struct const*> structs;
-        structs.emplace_back(&layout);
+        VertexBufferLayout layout;
 
         m_resource_manager->add<ResourceType::Mesh>(
             "square",

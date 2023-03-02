@@ -96,58 +96,23 @@ namespace Toy2D {
         RenderContext::getInstance().submit(square_mesh->getMesh(), transform, color, tex_index, tiling_factor, entity_id);
     }
 
-    void Renderer2D::drawCellQuad(
-        const Vector2&           position,
-        const Vector2&           size,
-        float                    rotation,
-        const Ref<SubTexture2D>& sub_texture,
-        const Color&             color) {
-        drawCellQuad({position.x, position.y, 0.0f}, size, rotation, sub_texture, color);
-    }
-
-    void Renderer2D::drawCellQuad(
-        const Vector3&           position,
-        const Vector2&           size,
-        float                    rotation,
-        const Ref<SubTexture2D>& sub_texture,
-        const Color&             color) {
-        // if (!GET_MESH_POOL().isMeshExist(sub_texture->constructSubTexName())) {
-        //     std::vector<VertexData2D> vertices;
-        //     uint32_t                  indices[]  = {0, 3, 1, 3, 2, 1};
-        //     auto                      tex_coords = sub_texture->getTexCoords();
-        //     vertices.push_back(
-        //         VertexData2D{{-0.5f, -0.5f, 0.0f}, {tex_coords[0].x, 1.0f - tex_coords[0].y}});
-        //     vertices.push_back(
-        //         VertexData2D{{0.5f, -0.5f, 0.0f}, {tex_coords[1].x, 1.0f - tex_coords[1].y}});
-        //     vertices.push_back(
-        //         VertexData2D{{0.5f, 0.5f, 0.0f}, {tex_coords[2].x, 1.0f - tex_coords[2].y}});
-        //     vertices.push_back(
-        //         VertexData2D{{-0.5f, 0.5f, 0.0f}, {tex_coords[3].x, 1.0f - tex_coords[3].y}});
-
-        //     GET_MESH_POOL().registerMesh(
-        //         sub_texture->constructSubTexName(),
-        //         vertices.data(),
-        //         vertices.size(),
-        //         indices,
-        //         6);
-        // }
-
-        // Matrix transform = Matrix::CreateRotationZ(XMConvertToRadians(-rotation))
-        //                    * Matrix::CreateScale(size.x, size.y, 1.0f)
-        //                    * Matrix::CreateTranslation(position);
-
-        // RenderContext::getInstance().submit(
-        //     GET_MESH_POOL().getMesh(sub_texture->constructSubTexName()),
-        //     transform,
-        //     color,
-        //     0, /* get the index of texture */
-        //     1.0f, -1);
-    }
-
     void Renderer2D::drawSprite(
         const Matrix&          transform,
         const SpriteComponent& src,
         int                    entity_id) {
         drawQuad(transform, src.color, src.tex_index, src.tiling_factor, entity_id);
+    }
+
+    void Renderer2D::drawTile(
+        const Matrix&        transform,
+        const TileComponent& tc,
+        int                  entity_id) {
+        RenderContext::getInstance().submit(
+            Application::get().getResourceMngr()->get<ResourceType::Mesh>(tc.tile.getTileName())->getMesh(),
+            transform,
+            tc.color,
+            Application::get().getResourceMngr()->index<ResourceType::Texture>(tc.tile.getTileSheet()->getName()),
+            1.0f,
+            entity_id);
     }
 } // namespace Toy2D

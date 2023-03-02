@@ -1,13 +1,7 @@
-// Box2D
-#include <box2d/b2_body.h>
-#include <box2d/b2_fixture.h>
-#include <box2d/b2_polygon_shape.h>
-#include <box2d/b2_world.h>
-
+#include "runtime/function/scene/scene.h"
 #include "runtime/function/render/render_system/renderer_2d.h"
 #include "runtime/function/scene/components.h"
 #include "runtime/function/scene/entity.h"
-#include "runtime/function/scene/scene.h"
 
 namespace Toy2D {
     Scene::~Scene() {
@@ -74,11 +68,18 @@ namespace Toy2D {
         if (curr_camera) {
             Renderer2D::beginScene(*curr_camera, camera_transform);
 
-            auto group = m_registry.group<TransformComponent>(entt::get<SpriteComponent>);
+            auto group = m_registry.group<>(entt::get<TransformComponent, SpriteComponent>, entt::exclude<TileComponent>);
             for (auto entity : group) {
                 auto [transform, sprite] = group.get<TransformComponent, SpriteComponent>(entity);
 
                 Renderer2D::drawSprite(transform.getTransform(), sprite, (int)entity);
+            }
+
+            auto tile_group = m_registry.group<>(entt::get<TransformComponent, TileComponent>, entt::exclude<SpriteComponent>);
+            for (auto entity : tile_group) {
+                auto [transform, tile] = tile_group.get<TransformComponent, TileComponent>(entity);
+
+                Renderer2D::drawTile(transform.getTransform(), tile, (int)entity);
             }
         }
 
@@ -119,11 +120,18 @@ namespace Toy2D {
     void Scene::onUpdateEditor(TimeStep timestep, EditorCamera& camera) {
         Renderer2D::beginScene(camera);
 
-        auto group = m_registry.group<TransformComponent>(entt::get<SpriteComponent>);
+        auto group = m_registry.group<>(entt::get<TransformComponent, SpriteComponent>, entt::exclude<TileComponent>);
         for (auto entity : group) {
             auto [transform, sprite] = group.get<TransformComponent, SpriteComponent>(entity);
 
             Renderer2D::drawSprite(transform.getTransform(), sprite, (int)entity);
+        }
+
+        auto tile_group = m_registry.group<>(entt::get<TransformComponent, TileComponent>, entt::exclude<SpriteComponent>);
+        for (auto entity : tile_group) {
+            auto [transform, tile] = tile_group.get<TransformComponent, TileComponent>(entity);
+
+            Renderer2D::drawTile(transform.getTransform(), tile, (int)entity);
         }
 
         Renderer2D::endScene();
@@ -169,6 +177,10 @@ namespace Toy2D {
 
     template <>
     void Scene::onComponentAdded<SpriteComponent>(Entity entity, SpriteComponent& component) {
+    }
+
+    template <>
+    void Scene::onComponentAdded<TileComponent>(Entity entity, TileComponent& component) {
     }
 
     template <>

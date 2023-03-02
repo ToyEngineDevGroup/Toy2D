@@ -13,9 +13,9 @@ namespace Toy2D {
         PROFILE_FUNCTION();
 
         Application::get().getResourceMngr()->add<ResourceType::Texture>(
-            Application::get().getConfigMngr()->getAssetFolder() / "resource/icon/DirectoryIcon.png");
+            Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/diricon_desc.json");
         Application::get().getResourceMngr()->add<ResourceType::Texture>(
-            Application::get().getConfigMngr()->getAssetFolder() / "resource/icon/FileIcon.png");
+            Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/fileicon_desc.json");
 
         m_active_scene  = CreateRef<Scene>();
         m_editor_camera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);

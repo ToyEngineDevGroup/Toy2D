@@ -17,10 +17,21 @@ target_precompile_headers(${TARGET_NAME} PUBLIC ${ROOT_DIR}/toy2d/source/runtime
 
 target_compile_definitions(${TARGET_NAME} PUBLIC ROOT_DIR=${CMAKE_SOURCE_DIR})
 
+find_package(RapidJSON CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
+find_package(box2d CONFIG REQUIRED)
+find_package(EnTT CONFIG REQUIRED)
+find_package(sol2 CONFIG REQUIRED)
+find_package(Lua REQUIRED)
+
+target_include_directories(${TARGET_NAME} PUBLIC ${LUA_INCLUDE_DIR})
+
+target_link_libraries(${TARGET_NAME} PUBLIC ${LUA_LIBRARIES})
+target_link_libraries(${TARGET_NAME} PUBLIC sol2)
 target_link_libraries(${TARGET_NAME} PUBLIC Chen::CDX12)
 target_link_libraries(${TARGET_NAME} PUBLIC spdlog::spdlog)
 target_link_libraries(${TARGET_NAME} PUBLIC rapidjson)
+target_link_libraries(${TARGET_NAME} PUBLIC EnTT::EnTT)
+target_link_libraries(${TARGET_NAME} PUBLIC box2d::box2d)
 target_link_libraries(${TARGET_NAME} PUBLIC imgui)
-target_link_libraries(${TARGET_NAME} PUBLIC entt)
 target_link_libraries(${TARGET_NAME} PUBLIC ImGuizmo)
-target_link_libraries(${TARGET_NAME} PUBLIC box2d)
