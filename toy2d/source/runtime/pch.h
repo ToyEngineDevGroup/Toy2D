@@ -38,11 +38,19 @@
 #include <thread>
 #include <variant>
 #include <vector>
+#include <queue>
 
 #include <SimpleMath.h>
+
+#include <box2d/box2d.h>
+#include <entt/entt.hpp>
 
 #include "runtime/core/base/core.h"
 #include "runtime/core/log/log_system.h"
 #include "runtime/function/debug/profiler.h"
 
 using namespace DirectX::SimpleMath;
+
+namespace Toy2D {
+	using EntityIdType = ENTT_ID_TYPE;
+}

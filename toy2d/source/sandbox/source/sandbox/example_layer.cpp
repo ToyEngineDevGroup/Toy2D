@@ -20,17 +20,45 @@ void ExampleLayer::onAttach() {
     player.addComponent<Toy2D::SpriteComponent>().tex_index =
         Toy2D::Application::get().getResourceMngr()->index<Toy2D::ResourceType::Texture>("bella");
     player.addComponent<Toy2D::NativeScriptComponent>().bind<PlayerController>();
-    auto& rigidbody = player.addComponent<Toy2D::Rigidbody2DComponent>();
-    rigidbody.type   = Toy2D::Rigidbody2DComponent::BodyType::Dynamic;
-    rigidbody.setAsRectange(0.5f, 0.5f);
+    {
+        auto& rigidbody             = player.addComponent<Toy2D::Rigidbody2DComponent>();
+        rigidbody.type              = Toy2D::Rigidbody2DComponent::BodyType::Dynamic;
+        rigidbody.is_fixed_rotation = true;
+        rigidbody.collider.createBox(0.5f, 0.5f);
+    }
 
     auto&& square = m_world.getActiveScene()->createEntity("square");
     square.addComponent<Toy2D::SpriteComponent>();
     square.addComponent<Toy2D::NativeScriptComponent>().bind<TexMarchingScript>();
-    square.addComponent<Toy2D::Rigidbody2DComponent>().setAsRectange(1.0f, 1.0f);
-    auto& transform = square.getComponent<Toy2D::TransformComponent>();
-    transform.translation.y = -1.5f;
-    transform.rotation.z    = 0.3f;
+    square.addComponent<Toy2D::Rigidbody2DComponent>().collider.createBox(1.0f, 1.0f);
+    {
+        auto& transform         = square.getComponent<Toy2D::TransformComponent>();
+        transform.translation.y = -1.5f;
+        transform.rotation.z    = 0.3f;
+    }
+
+    auto&& another_square = m_world.getActiveScene()->createEntity("another_square");
+    another_square.addComponent<Toy2D::SpriteComponent>();
+    another_square.addComponent<Toy2D::NativeScriptComponent>().bind<TexMarchingScript>();
+    another_square.addComponent<Toy2D::Rigidbody2DComponent>().collider.createBox(1.0f, 1.0f);
+    {
+        auto& transform         = another_square.getComponent<Toy2D::TransformComponent>();
+        transform.translation.y = -1.5f;
+        transform.translation.x = -1.0f;
+        transform.rotation.z    = 0.3f;
+    }
+
+    auto&& trigger = m_world.getActiveScene()->createEntity("trigger");
+    {
+        auto& rigidbody             = trigger.addComponent<Toy2D::Rigidbody2DComponent>();
+        rigidbody.is_fixed_rotation = true;
+        rigidbody.collider.is_trigger = true;
+        rigidbody.collider.createBox(1.0f, 1.0f);
+    }
+    {
+        auto& transform         = trigger.getComponent<Toy2D::TransformComponent>();
+        transform.translation.x = -1.5f;
+    }
 
     auto&& tile = m_world.getActiveScene()->createEntity("tile");
     tile.addComponent<Toy2D::TileComponent>(

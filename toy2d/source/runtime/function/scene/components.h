@@ -3,7 +3,7 @@
 #include "runtime/core/util/time_step.h"
 #include "runtime/function/scene/scene_camera.h"
 #include "runtime/function/scene/scriptable_entity.h"
-#include "runtime/function/physics/collision_shape2d.h"
+#include "runtime/function/physics/collider2d.h"
 #include "runtime/resource/resource/tile_sheet.h"
 
 namespace Toy2D {
@@ -61,6 +61,7 @@ namespace Toy2D {
         SceneCamera camera;
         bool        is_current{true};
         bool        is_fixed_aspectRatio{false};
+        bool        is_fixed_rotation{true};
 
         CameraComponent()                       = default;
         CameraComponent(const CameraComponent&) = default;
@@ -88,29 +89,24 @@ namespace Toy2D {
                               Kinematic };
 
         BodyType type{BodyType::Static};
-        bool     is_fixed_rotation{false};
+        Collider2D collider;
+        // Shape and type is never mutable.
 
-        // Storage for runtime
-        void* runtime_body{nullptr};
-        CollisionShape2D shape;
+        bool     is_fixed_rotation{false};
+        bool     is_mutable{true}; 
+        bool     show_box{true};
 
         Rigidbody2DComponent()                            = default;
         Rigidbody2DComponent(const Rigidbody2DComponent&) = default;
 
-        bool submit_transform_change{false};
-        bool submit_velocity_change{false};
-        Vector2 velocity{0.0f, 0.0f};
-        float   a_velocity;
+        // Storage for runtime
+        void* runtime_body{nullptr};
 
-        void setAsRectange(float w, float h) {
-            shape.createBox(w, h);
-        }
+        Vector2 linear_velocity{0.0f, 0.0f};
+        float   angular_velocity{0.0f};
 
-        void setVelocity(float v_x, float v_y) {
-            velocity.x = v_x;
-            velocity.y = v_y;
-            submit_velocity_change = true;
-        }
+        Vector2 old_linear_velocity{0.0f, 0.0f};
+        float   old_angular_velocity{0.0f};
 
     };
 

@@ -38,14 +38,27 @@ public:
         float speed     = 3.0f;
 
         if (Toy2D::InputSystem::isKeyPressed('A'))
-            rigidbody2d.setVelocity(-2.5f, 0.0f);
+            rigidbody2d.linear_velocity.x = -speed;
         if (Toy2D::InputSystem::isKeyPressed('D'))
-            rigidbody2d.setVelocity(2.5f, 0.0f);
+            rigidbody2d.linear_velocity.x = speed;
         if (Toy2D::InputSystem::isKeyPressed('W'))
-            rigidbody2d.setVelocity(0.0f, 2.5f);
+            rigidbody2d.linear_velocity.y = speed;
         if (Toy2D::InputSystem::isKeyPressed('S'))
-            rigidbody2d.setVelocity(0.0f, -2.5f);
+            rigidbody2d.linear_velocity.y = -speed;
     }
+
+    void onCollisionEnter(Toy2D::Entity entity) {
+        if (entity.hasComponent<Toy2D::NameComponent>()) {
+            LOG_INFO("Enter: {}", entity.getComponent<Toy2D::NameComponent>().name);
+        }
+    }
+
+    void onCollisionExit(Toy2D::Entity entity) {
+        if (entity.hasComponent<Toy2D::NameComponent>()) {
+            LOG_INFO("Exit: {}", entity.getComponent<Toy2D::NameComponent>().name);
+        }
+    }
+
 };
 
 class TexMarchingScript : public Toy2D::ScriptableEntity {

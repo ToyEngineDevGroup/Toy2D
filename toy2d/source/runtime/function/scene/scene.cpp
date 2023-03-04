@@ -55,8 +55,14 @@ namespace Toy2D {
             for (auto entity : view) {
                 auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
                 TransformComponent transform_cam;
-                transform_cam.translation = transform.translation;
-                transform_cam.scale       = transform.scale;
+                if (camera.is_fixed_rotation) {
+                    transform_cam.translation = transform.translation;
+                    transform_cam.scale       = transform.scale;
+                }
+                else {
+                    transform_cam = transform;
+                }
+                
                 if (camera.is_current) {
                     curr_camera      = &camera.camera;
                     camera_transform = transform_cam.getTransform();
@@ -83,7 +89,7 @@ namespace Toy2D {
             }
         }
 
-        Renderer2D::endScene();
+        
 
         for (auto entity : m_submit_body_creation) {
             bool is_dynamic = false, is_kinematic = false;
@@ -97,7 +103,7 @@ namespace Toy2D {
                     is_kinematic = true;
                     break;
             }
-            rigidbody2d.runtime_body = reinterpret_cast<void*>(m_physics2d_manager->createBody((int)entity, transform.translation.x, transform.translation.y, transform.rotation.z, is_dynamic, is_kinematic, rigidbody2d.shape));
+            rigidbody2d.runtime_body = reinterpret_cast<void*>(m_physics2d_manager->createBody((uint32_t)entity, transform.translation.x, transform.translation.y, transform.rotation.z, is_dynamic, is_kinematic, rigidbody2d.is_fixed_rotation, rigidbody2d.collider));
         }
         m_submit_body_creation.clear();
 
@@ -105,16 +111,35 @@ namespace Toy2D {
         for (auto entity : rigidbody2d_view) {
             auto& transform = m_registry.get<TransformComponent>(entity);
             auto& rigidbody = m_registry.get<Rigidbody2DComponent>(entity);
-            std::tie(transform.translation.x, transform.translation.y, transform.rotation.z) = m_physics2d_manager->getTransform(rigidbody.runtime_body);
-            if (rigidbody.submit_velocity_change) {
-                rigidbody.submit_velocity_change = false;
-                m_physics2d_manager->setVelocity(rigidbody.runtime_body, rigidbody.velocity.x, rigidbody.velocity.y, rigidbody.a_velocity);
+              
+            if (rigidbody.is_mutable) {
+                if (rigidbody.linear_velocity.x != rigidbody.old_linear_velocity.x || rigidbody.linear_velocity.y != rigidbody.old_linear_velocity.y || rigidbody.angular_velocity != rigidbody.old_angular_velocity) {
+                    m_physics2d_manager->setVelocity(rigidbody.runtime_body, rigidbody.linear_velocity.x, rigidbody.linear_velocity.y, rigidbody.angular_velocity);
+                }
             }
-            std::tie(rigidbody.velocity.x, rigidbody.velocity.y, rigidbody.a_velocity) = m_physics2d_manager->getVelocity(rigidbody.runtime_body);
+        }
+        m_physics2d_manager->update();
+        for (auto entity : rigidbody2d_view) {
+            auto& transform = m_registry.get<TransformComponent>(entity);
+            auto& rigidbody = m_registry.get<Rigidbody2DComponent>(entity);
+            std::tie(rigidbody.old_linear_velocity.x, rigidbody.old_linear_velocity.y, rigidbody.old_angular_velocity) = m_physics2d_manager->getVelocity(rigidbody.runtime_body);
+            std::tie(rigidbody.linear_velocity.x, rigidbody.linear_velocity.y, rigidbody.angular_velocity)             = std::make_tuple(rigidbody.old_linear_velocity.x, rigidbody.old_linear_velocity.y, rigidbody.old_angular_velocity);
+            std::tie(transform.translation.x, transform.translation.y, transform.rotation.z)                           = m_physics2d_manager->getTransform(rigidbody.runtime_body);   
+            if (m_registry.all_of<NativeScriptComponent>(entity)) {
+                auto& nas = m_registry.get<NativeScriptComponent>(entity);
+                while (rigidbody.collider.hasCollisionEnterEvent()) {
+                    nas.instance->onCollisionEnter(Entity{(entt::entity)rigidbody.collider.getCollisionEnterEvent(), this});
+                }
+                while (rigidbody.collider.hasCollisionExitEvent()) {
+                    nas.instance->onCollisionExit(Entity{(entt::entity)rigidbody.collider.getCollisionExitEvent(), this});
+                }
+            }
+            if (rigidbody.show_box) {
+                Renderer2D::drawQuad(transform.translation, Vector2(rigidbody.collider.getBoxWidth(), rigidbody.collider.getBoxHeight()), -180 * transform.rotation.z / 3.1415926535, Color(1.0f, 0.1f, 0.1f, 0.4f));
+            }
         }
 
-        m_physics2d_manager->update();
-
+        Renderer2D::endScene();
     }
 
     void Scene::onUpdateEditor(TimeStep timestep, EditorCamera& camera) {

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-
 namespace Toy2D {
     template <class T>
     inline void HashCombine(size_t& seed, const T& v) {
