@@ -25,12 +25,10 @@ void ExampleLayer::onAttach() {
 
     auto&& player = m_world.getActiveScene()->createEntity("player");
     player.addComponent<Toy2D::CameraComponent>().camera.setOrthographicSize(5.0f);
-    player.addComponent<Toy2D::SpriteComponent>().tex_index =
-        Toy2D::Application::get().getResourceMngr()->index<Toy2D::ResourceType::Texture>("player");
+    player.addComponent<Toy2D::TileComponent>(
+        Toy2D::Application::get().getResourceMngr()->get<Toy2D::ResourceType::TileSheet>("player"));
     {
         auto& transform = player.getComponent<Toy2D::TransformComponent>();
-        transform.scale.x = 0.5;
-        transform.scale.y = 0.5;
     }
     player.addComponent<Toy2D::NativeScriptComponent>().bind<PlayerController>();
     {
@@ -62,7 +60,7 @@ void ExampleLayer::onAttach() {
     int  money_count = 0;
     auto addMoney = [=](float x, float y) {
         auto&& money = m_world.getActiveScene()->createEntity(std::format("money_{}", money_count));
-        if(0){
+        {
             auto& sprite     = money.addComponent<Toy2D::SpriteComponent>();
             sprite.tex_index = Toy2D::Application::get().getResourceMngr()->index<Toy2D::ResourceType::Texture>("money");
         }
@@ -82,7 +80,7 @@ void ExampleLayer::onAttach() {
     };
 
     for (int i = 0; i < 10; ++i)
-        for (int j = 0; j < 100; ++j)
+        for (int j = 0; j < 10; ++j)
             addMoney(i*0.2-1.0, j*0.2);
 
     auto&& tile = m_world.getActiveScene()->createEntity("tile");
