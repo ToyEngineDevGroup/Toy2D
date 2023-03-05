@@ -108,6 +108,9 @@ namespace Toy2D {
         Vector2 old_linear_velocity{0.0f, 0.0f};
         float   old_angular_velocity{0.0f};
 
+        Vector2 old_translation{0.0f, 0.0f};
+        float   old_rotation{0.0f};
+
     };
 
 } // namespace Toy2D

@@ -78,7 +78,8 @@ namespace Toy2D {
             for (auto entity : group) {
                 auto [transform, sprite] = group.get<TransformComponent, SpriteComponent>(entity);
 
-                Renderer2D::drawSprite(transform.getTransform(), sprite, (int)entity);
+                    Renderer2D::drawSprite(transform.getTransform(), sprite, (int)entity);
+
             }
 
             auto tile_group = m_registry.group<>(entt::get<TransformComponent, TileComponent>, entt::exclude<SpriteComponent>);
@@ -116,15 +117,29 @@ namespace Toy2D {
                 if (rigidbody.linear_velocity.x != rigidbody.old_linear_velocity.x || rigidbody.linear_velocity.y != rigidbody.old_linear_velocity.y || rigidbody.angular_velocity != rigidbody.old_angular_velocity) {
                     m_physics2d_manager->setVelocity(rigidbody.runtime_body, rigidbody.linear_velocity.x, rigidbody.linear_velocity.y, rigidbody.angular_velocity);
                 }
+                if (transform.translation.x != rigidbody.old_translation.x || transform.translation.y != rigidbody.old_translation.y || transform.rotation.z != rigidbody.old_rotation) {
+                    m_physics2d_manager->setTransform(rigidbody.runtime_body, transform.translation.x, transform.translation.y, transform.rotation.z);
+                }
             }
         }
         m_physics2d_manager->update();
         for (auto entity : rigidbody2d_view) {
             auto& transform = m_registry.get<TransformComponent>(entity);
             auto& rigidbody = m_registry.get<Rigidbody2DComponent>(entity);
+            if (rigidbody.show_box) {
+                Color box_color;
+                if (rigidbody.type == Rigidbody2DComponent::BodyType::Dynamic) {
+                    box_color = Color(0.4, 0.1, 0.1, 0.4);
+                }
+                else {
+                    box_color = Color(0.1, 0.1, 0.4, 0.4);
+                }
+                Renderer2D::drawQuad(transform.translation, Vector2(rigidbody.collider.getBoxWidth(), rigidbody.collider.getBoxHeight()), -180 * transform.rotation.z / 3.1415926535, box_color);
+            }
             std::tie(rigidbody.old_linear_velocity.x, rigidbody.old_linear_velocity.y, rigidbody.old_angular_velocity) = m_physics2d_manager->getVelocity(rigidbody.runtime_body);
             std::tie(rigidbody.linear_velocity.x, rigidbody.linear_velocity.y, rigidbody.angular_velocity)             = std::make_tuple(rigidbody.old_linear_velocity.x, rigidbody.old_linear_velocity.y, rigidbody.old_angular_velocity);
-            std::tie(transform.translation.x, transform.translation.y, transform.rotation.z)                           = m_physics2d_manager->getTransform(rigidbody.runtime_body);   
+            std::tie(rigidbody.old_translation.x, rigidbody.old_translation.y, rigidbody.old_rotation)                 = m_physics2d_manager->getTransform(rigidbody.runtime_body);   
+            std::tie(transform.translation.x, transform.translation.y, transform.rotation.z)                           = std::make_tuple(rigidbody.old_translation.x, rigidbody.old_translation.y, rigidbody.old_rotation); 
             if (m_registry.all_of<NativeScriptComponent>(entity)) {
                 auto& nas = m_registry.get<NativeScriptComponent>(entity);
                 while (rigidbody.collider.hasCollisionEnterEvent()) {
@@ -133,9 +148,6 @@ namespace Toy2D {
                 while (rigidbody.collider.hasCollisionExitEvent()) {
                     nas.instance->onCollisionExit(Entity{(entt::entity)rigidbody.collider.getCollisionExitEvent(), this});
                 }
-            }
-            if (rigidbody.show_box) {
-                Renderer2D::drawQuad(transform.translation, Vector2(rigidbody.collider.getBoxWidth(), rigidbody.collider.getBoxHeight()), -180 * transform.rotation.z / 3.1415926535, Color(1.0f, 0.1f, 0.1f, 0.4f));
             }
         }
 

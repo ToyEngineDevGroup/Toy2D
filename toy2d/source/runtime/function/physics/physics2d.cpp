@@ -2,6 +2,35 @@
 
 namespace Toy2D {
 
+    class ContactListener2D : public b2ContactListener {
+    public:
+        void BeginContact(b2Contact* contact) {
+            Collider2D* colliderA = (Collider2D*)contact->GetFixtureA()->GetBody()->GetUserData().pointer;
+            Collider2D* colliderB = (Collider2D*)contact->GetFixtureB()->GetBody()->GetUserData().pointer;
+            colliderA->m_collision_enter_event.insert(colliderB->getEntity());
+            colliderB->m_collision_enter_event.insert(colliderA->getEntity());
+        }
+        void EndContact(b2Contact* contact) {
+            Collider2D* colliderA = (Collider2D*)contact->GetFixtureA()->GetBody()->GetUserData().pointer;
+            Collider2D* colliderB = (Collider2D*)contact->GetFixtureB()->GetBody()->GetUserData().pointer;
+            colliderA->m_collision_exit_event.insert(colliderB->getEntity());
+            colliderB->m_collision_exit_event.insert(colliderA->getEntity());
+        }
+        void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) {
+            Collider2D* colliderA = (Collider2D*)contact->GetFixtureA()->GetBody()->GetUserData().pointer;
+            Collider2D* colliderB = (Collider2D*)contact->GetFixtureB()->GetBody()->GetUserData().pointer;
+            if ((colliderA->is_trigger || colliderB->is_trigger)) {
+                if (!colliderA->stayWith(colliderB->getEntity())) {
+                    colliderA->m_collision_enter_event.insert(colliderB->getEntity());
+                    colliderB->m_collision_enter_event.insert(colliderA->getEntity());
+                }
+                contact->SetEnabled(false);
+            }
+        }
+        void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) {
+        }
+    };
+
     Physics2DManager::Physics2DManager() {
         resetWorld();
     }
@@ -69,6 +98,11 @@ namespace Toy2D {
         return Transform2D(body->GetPosition().x, body->GetPosition().y, body->GetAngle());
     }
 
+    void Physics2DManager::setTransform(void* runtime_body, float x, float y, float r) {
+        b2Body* body = reinterpret_cast<b2Body*>(runtime_body);
+        body->SetTransform(b2Vec2(x, y), r);
+    }
+
     Physics2DManager::Transform2D Physics2DManager::getVelocity(void* runtime_body) {
         b2Body* body = reinterpret_cast<b2Body*>(runtime_body);
         return Transform2D(body->GetLinearVelocity().x, body->GetLinearVelocity().y, body->GetAngularVelocity());
@@ -81,7 +115,7 @@ namespace Toy2D {
     }
 
     void Physics2DManager::update() {
-        m_world->Step(0.001, 1, 1);
+        m_world->Step(0.01, 1, 1);
     }
 
 }

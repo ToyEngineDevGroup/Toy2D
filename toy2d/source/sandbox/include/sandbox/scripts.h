@@ -1,7 +1,7 @@
 #pragma once
 
 #include "runtime/toy2d.h"
-
+extern int* g_player_money;
 class CameraController : public Toy2D::ScriptableEntity {
 public:
     void onCreate() override {
@@ -28,6 +28,7 @@ public:
 class PlayerController : public Toy2D::ScriptableEntity {
 public:
     void onCreate() override {
+        g_player_money = &money;
     }
 
     void onDestroy() override {
@@ -47,16 +48,20 @@ public:
             rigidbody2d.linear_velocity.y = -speed;
     }
 
+    int money{0};
+
     void onCollisionEnter(Toy2D::Entity entity) {
-        if (entity.hasComponent<Toy2D::NameComponent>()) {
-            LOG_INFO("Enter: {}", entity.getComponent<Toy2D::NameComponent>().name);
+        if (entity.hasComponent<Toy2D::NameComponent>() && entity.hasComponent<Toy2D::TransformComponent>()) {
+            if (entity.getComponent<Toy2D::NameComponent>().name.starts_with("money_")) {
+                money = money + 1;
+                LOG_INFO("You got $1! Now you have ${}", money);
+                entity.getComponent<Toy2D::TransformComponent>().translation.y = -100.0f;
+            }
         }
     }
 
     void onCollisionExit(Toy2D::Entity entity) {
-        if (entity.hasComponent<Toy2D::NameComponent>()) {
-            LOG_INFO("Exit: {}", entity.getComponent<Toy2D::NameComponent>().name);
-        }
+
     }
 
 };

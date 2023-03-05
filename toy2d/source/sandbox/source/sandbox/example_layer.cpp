@@ -1,6 +1,8 @@
 #include "sandbox/example_layer.h"
 #include "sandbox/scripts.h"
 
+int* g_player_money = nullptr;
+
 void ExampleLayer::onAttach() {
     LOG_TRACE("attach");
 
@@ -10,6 +12,12 @@ void ExampleLayer::onAttach() {
         Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/asoul_desc.json");
     Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
         Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/bella_desc.json");
+    Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
+        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/box_desc.json");
+    Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
+        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/player_desc.json");
+    Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
+        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/money_desc.json");
 
     m_world.addScene("main").setActiveScene("main").onResize(
         Toy2D::Application::get().getWindow()->getWidth(),
@@ -18,7 +26,12 @@ void ExampleLayer::onAttach() {
     auto&& player = m_world.getActiveScene()->createEntity("player");
     player.addComponent<Toy2D::CameraComponent>().camera.setOrthographicSize(5.0f);
     player.addComponent<Toy2D::SpriteComponent>().tex_index =
-        Toy2D::Application::get().getResourceMngr()->index<Toy2D::ResourceType::Texture>("bella");
+        Toy2D::Application::get().getResourceMngr()->index<Toy2D::ResourceType::Texture>("player");
+    {
+        auto& transform = player.getComponent<Toy2D::TransformComponent>();
+        transform.scale.x = 0.5;
+        transform.scale.y = 0.5;
+    }
     player.addComponent<Toy2D::NativeScriptComponent>().bind<PlayerController>();
     {
         auto& rigidbody             = player.addComponent<Toy2D::Rigidbody2DComponent>();
@@ -29,7 +42,6 @@ void ExampleLayer::onAttach() {
 
     auto&& square = m_world.getActiveScene()->createEntity("square");
     square.addComponent<Toy2D::SpriteComponent>();
-    square.addComponent<Toy2D::NativeScriptComponent>().bind<TexMarchingScript>();
     square.addComponent<Toy2D::Rigidbody2DComponent>().collider.createBox(1.0f, 1.0f);
     {
         auto& transform         = square.getComponent<Toy2D::TransformComponent>();
@@ -39,7 +51,6 @@ void ExampleLayer::onAttach() {
 
     auto&& another_square = m_world.getActiveScene()->createEntity("another_square");
     another_square.addComponent<Toy2D::SpriteComponent>();
-    another_square.addComponent<Toy2D::NativeScriptComponent>().bind<TexMarchingScript>();
     another_square.addComponent<Toy2D::Rigidbody2DComponent>().collider.createBox(1.0f, 1.0f);
     {
         auto& transform         = another_square.getComponent<Toy2D::TransformComponent>();
@@ -48,17 +59,31 @@ void ExampleLayer::onAttach() {
         transform.rotation.z    = 0.3f;
     }
 
-    auto&& trigger = m_world.getActiveScene()->createEntity("trigger");
-    {
-        auto& rigidbody             = trigger.addComponent<Toy2D::Rigidbody2DComponent>();
-        rigidbody.is_fixed_rotation = true;
-        rigidbody.collider.is_trigger = true;
-        rigidbody.collider.createBox(1.0f, 1.0f);
-    }
-    {
-        auto& transform         = trigger.getComponent<Toy2D::TransformComponent>();
-        transform.translation.x = -1.5f;
-    }
+    int  money_count = 0;
+    auto addMoney = [=](float x, float y) {
+        auto&& money = m_world.getActiveScene()->createEntity(std::format("money_{}", money_count));
+        if(0){
+            auto& sprite     = money.addComponent<Toy2D::SpriteComponent>();
+            sprite.tex_index = Toy2D::Application::get().getResourceMngr()->index<Toy2D::ResourceType::Texture>("money");
+        }
+        {
+            auto& rigidbody               = money.addComponent<Toy2D::Rigidbody2DComponent>();
+            rigidbody.is_fixed_rotation   = true;
+            rigidbody.collider.is_trigger = true;
+            rigidbody.collider.createBox(0.1f, 0.1f);
+        }
+        {
+            auto& transform         = money.getComponent<Toy2D::TransformComponent>();
+            transform.translation.x = x;
+            transform.translation.y = y;
+            transform.scale.x       = 0.1;
+            transform.scale.y       = 0.1;
+        }
+    };
+
+    for (int i = 0; i < 10; ++i)
+        for (int j = 0; j < 100; ++j)
+            addMoney(i*0.2-1.0, j*0.2);
 
     auto&& tile = m_world.getActiveScene()->createEntity("tile");
     tile.addComponent<Toy2D::TileComponent>(
@@ -88,8 +113,9 @@ void ExampleLayer::onImGuiRender() {
         []() {
         LOG_INFO("Button Clicked");
         });
-
-    Toy2D::Widgets::drawText("Move with W,A,S,D. Have a try!!!");
+    
+    if (g_player_money)
+        Toy2D::Widgets::drawText(std::format("Move with W,A,S,D. Have a try!!! [ Your money: {} ]", *g_player_money));
 }
 
 void ExampleLayer::onEvent(Toy2D::Event& event) {

@@ -1,5 +1,7 @@
 #pragma once
 
+// 已放弃使用预编译头：在查找预编译头时遇到了意外的文件尾
+#include "runtime/pch.h"
 #include "runtime/function/physics/collider2d.h"
 
 namespace Toy2D {
@@ -24,6 +26,7 @@ namespace Toy2D {
         
         using Transform2D = std::tuple<float, float, float>;
         Transform2D getTransform(void* runtime_body);
+        void        setTransform(void* runtime_body, float x, float y, float r);
         Transform2D getVelocity(void* runtime_body);
         void        setVelocity(void* runtime_body, float v_x, float v_y, float v_r);
         void        update();
