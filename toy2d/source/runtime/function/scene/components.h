@@ -45,15 +45,18 @@ namespace Toy2D {
     };
 
     struct TileComponent {
-        Tile  tile;
+        Resource<ResourceType::TileSheet>* tile_sheet;
+        uint32_t                           coord_x{0};
+        uint32_t                           coord_y{0};
+        uint32_t                           size_x{1};
+        uint32_t                           size_y{1};
+
         Color color{1.0f, 1.0f, 1.0f, 1.0f};
 
         TileComponent()                     = default;
         TileComponent(const TileComponent&) = default;
-        TileComponent(Resource<ResourceType::TileSheet>* tile_sheet,
-                      const Vector2&                     coords,
-                      const Vector2&                     tile_size = {1.0f, 1.0f}) :
-            tile(tile_sheet, coords, tile_size) {}
+        TileComponent(Resource<ResourceType::TileSheet>* _tile_sheet) :
+            tile_sheet(_tile_sheet) {}
     };
 
     struct CameraComponent {
