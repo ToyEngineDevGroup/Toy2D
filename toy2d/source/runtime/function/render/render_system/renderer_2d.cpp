@@ -107,11 +107,15 @@ namespace Toy2D {
         const Matrix&        transform,
         const TileComponent& tc,
         int                  entity_id) {
+        Tile tile(tc.tile_sheet,
+                  Vector2{float(tc.coord_x), float(tc.coord_y)},
+                  Vector2{float(tc.size_x), float(tc.size_y)});
+
         RenderContext::getInstance().submit(
-            Application::get().getResourceMngr()->get<ResourceType::Mesh>(tc.tile.getTileName())->getMesh(),
+            Application::get().getResourceMngr()->get<ResourceType::Mesh>(tile.getTileName())->getMesh(),
             transform,
             tc.color,
-            Application::get().getResourceMngr()->index<ResourceType::Texture>(tc.tile.getTileSheet()->getName()),
+            Application::get().getResourceMngr()->index<ResourceType::Texture>(tile.getTileSheet()->getName()),
             1.0f,
             entity_id);
     }

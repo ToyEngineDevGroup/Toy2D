@@ -26,12 +26,12 @@ namespace Toy2D {
         if (Application::get().getResourceMngr()->has<ResourceType::Mesh>(m_tile_name)) return;
 
         Vector2 min = {
-            coords.x / tile_sheet->getRow(),
-            coords.y / tile_sheet->getCol()};
+            coords.x / tile_sheet->getCol(),
+            coords.y / tile_sheet->getRow()};
 
         Vector2 max = {
-            (coords.x + tile_size.x) / tile_sheet->getRow(),
-            (coords.y + tile_size.y) / tile_sheet->getCol()};
+            (coords.x + tile_size.x) / tile_sheet->getCol(),
+            (coords.y + tile_size.y) / tile_sheet->getRow()};
 
         uint32_t     indices[]  = {0, 3, 1, 3, 2, 1};
         VertexData2D vertices[] = {

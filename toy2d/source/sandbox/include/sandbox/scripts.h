@@ -85,3 +85,22 @@ public:
         }
     }
 };
+
+class AnimeScript : public Toy2D::ScriptableEntity {
+    void onCreate() override {
+    }
+
+    void onDestroy() override {
+    }
+
+    void onUpdate(Toy2D::TimeStep timestep) override {
+        static uint32_t x_pos        = 0;
+        static float    elapsed_time = 0.0f;
+        elapsed_time += timestep;
+        if (elapsed_time >= 0.1f) {
+            auto& tile   = getComponent<Toy2D::TileComponent>();
+            tile.coord_x = (tile.coord_x + 1) % 6;
+            elapsed_time -= 0.1f;
+        }
+    }
+};

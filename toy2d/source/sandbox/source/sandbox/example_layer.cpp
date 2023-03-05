@@ -7,7 +7,7 @@ void ExampleLayer::onAttach() {
     LOG_TRACE("attach");
 
     Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::TileSheet>(
-        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tilesheet/tilesheet.json");
+        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tilesheet/player.json");
     Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
         Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/asoul_desc.json");
     Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
@@ -87,9 +87,8 @@ void ExampleLayer::onAttach() {
 
     auto&& tile = m_world.getActiveScene()->createEntity("tile");
     tile.addComponent<Toy2D::TileComponent>(
-        Toy2D::Application::get().getResourceMngr()->get<Toy2D::ResourceType::TileSheet>("tilesheet"),
-        Vector2{0, 3});
-    tile.getComponent<Toy2D::TransformComponent>().translation.x += 3.0f;
+        Toy2D::Application::get().getResourceMngr()->get<Toy2D::ResourceType::TileSheet>("player"));
+    tile.addComponent<Toy2D::NativeScriptComponent>().bind<AnimeScript>();
 
     // Toy2D::SceneSerializer serializer(m_world.getActiveScene());
     // serializer.deserialize(Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "scene/scene.json");
