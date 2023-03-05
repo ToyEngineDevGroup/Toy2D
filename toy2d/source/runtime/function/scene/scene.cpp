@@ -1,4 +1,5 @@
 #include "runtime/function/scene/scene.h"
+#include "runtime/core/base/application.h"
 #include "runtime/function/render/render_system/renderer_2d.h"
 #include "runtime/function/scene/components.h"
 #include "runtime/function/scene/entity.h"
@@ -26,15 +27,27 @@ namespace Toy2D {
     }
 
     void Scene::onRuntimeStart() {
+        // update lua scripts
+        {
+            m_registry.view<LuaScriptComponent>().each([=](auto entity, LuaScriptComponent& lsc) {
+                lsc.luaCall("onCreate");
+            });
+        }
     }
 
     void Scene::onRuntimeStop() {
+        // update lua scripts
+        {
+            m_registry.view<LuaScriptComponent>().each([=](auto entity, LuaScriptComponent& lsc) {
+                lsc.luaCall("onDestroy");
+            });
+        }
     }
 
     void Scene::onUpdateRuntime(TimeStep timestep) {
         // update scripts
         {
-            m_registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc) {
+            m_registry.view<NativeScriptComponent>().each([=](auto entity, NativeScriptComponent& nsc) {
                 if (!nsc.instance) {
                     nsc.instance           = nsc.instantiateScript();
                     nsc.instance->m_entity = Entity{entity, this};
@@ -42,6 +55,13 @@ namespace Toy2D {
                 }
 
                 nsc.instance->onUpdate(timestep);
+            });
+        }
+
+        // update lua scripts
+        {
+            m_registry.view<LuaScriptComponent>().each([=](auto entity, LuaScriptComponent& lsc) {
+                lsc.luaCall("onUpdate", timestep.getSeconds());
             });
         }
 
@@ -126,9 +146,10 @@ namespace Toy2D {
         return {};
     }
 
+    // ************************************************************************************************
+
     template <typename T>
     void Scene::onComponentAdded(Entity entity, T& component) {
-        // static_assert(false);
     }
 
     template <>
@@ -154,6 +175,46 @@ namespace Toy2D {
 
     template <>
     void Scene::onComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component) {
+    }
+
+    template <>
+    void Scene::onComponentAdded<LuaScriptComponent>(Entity entity, LuaScriptComponent& component) {
+        Application::get().getLuaInterpreter()->consider(&component);
+    }
+
+    // ************************************************************************************************
+
+    template <typename T>
+    void Scene::onComponentErased(Entity entity, T& component) {
+    }
+
+    template <>
+    void Scene::onComponentErased<TransformComponent>(Entity entity, TransformComponent& component) {
+    }
+
+    template <>
+    void Scene::onComponentErased<CameraComponent>(Entity entity, CameraComponent& component) {
+    }
+
+    template <>
+    void Scene::onComponentErased<SpriteComponent>(Entity entity, SpriteComponent& component) {
+    }
+
+    template <>
+    void Scene::onComponentErased<TileComponent>(Entity entity, TileComponent& component) {
+    }
+
+    template <>
+    void Scene::onComponentErased<NameComponent>(Entity entity, NameComponent& component) {
+    }
+
+    template <>
+    void Scene::onComponentErased<NativeScriptComponent>(Entity entity, NativeScriptComponent& component) {
+    }
+
+    template <>
+    void Scene::onComponentErased<LuaScriptComponent>(Entity entity, LuaScriptComponent& component) {
+        Application::get().getLuaInterpreter()->unconsider(&component);
     }
 
 } // namespace Toy2D

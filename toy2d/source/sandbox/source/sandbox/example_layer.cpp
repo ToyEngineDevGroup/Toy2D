@@ -24,6 +24,8 @@ void ExampleLayer::onAttach() {
     tile.addComponent<Toy2D::TileComponent>(
         Toy2D::Application::get().getResourceMngr()->get<Toy2D::ResourceType::TileSheet>("player"));
     tile.addComponent<Toy2D::NativeScriptComponent>().bind<AnimeScript>();
+    tile.addComponent<Toy2D::LuaScriptComponent>(
+        Toy2D::Application::get().getConfigMngr()->getScriptFolder() / "player_controller.lua");
 
     // Toy2D::SceneSerializer serializer(m_world.getActiveScene());
     // serializer.deserialize(Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "scene/scene.json");

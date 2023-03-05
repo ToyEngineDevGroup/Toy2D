@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sol/sol.hpp>
+
 #include "runtime/core/util/time_step.h"
 #include "runtime/function/scene/scene_camera.h"
 #include "runtime/function/scene/scriptable_entity.h"
@@ -80,6 +82,52 @@ namespace Toy2D {
         void bind() {
             instantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
             destroyScript     = [](NativeScriptComponent* nsc) { delete nsc->instance; nsc->instance = nullptr; };
+        }
+    };
+
+    struct LuaScriptComponent {
+        sol::table            object{sol::nil};
+        std::filesystem::path script_path;
+
+        LuaScriptComponent()                          = default;
+        LuaScriptComponent(const LuaScriptComponent&) = default;
+        LuaScriptComponent(const std::filesystem::path& path) :
+            script_path(path) {}
+
+        bool registerToLuaContext(sol::state& p_luaState) {
+            auto result = p_luaState.safe_script_file(script_path.string(), &sol::script_pass_on_error);
+
+            if (!result.valid()) {
+                sol::error err = result;
+                LOG_ERROR(err.what());
+                return false;
+            }
+            else {
+                if (result.return_count() == 1 && result[0].is<sol::table>()) {
+                    object = result[0];
+                    return true;
+                }
+                else {
+                    LOG_ERROR("{} missing return expression", script_path.string());
+                    return false;
+                }
+            }
+        }
+
+        void unregisterFromLuaContext() { object = sol::nil; }
+
+        template <typename... Args>
+        void luaCall(const std::string& p_functionName, Args&&... p_args) {
+            if (object.valid()) {
+                if (object[p_functionName].valid()) {
+                    sol::protected_function pfr       = object[p_functionName];
+                    auto                    pfrResult = pfr.call(object, std::forward<Args>(p_args)...);
+                    if (!pfrResult.valid()) {
+                        sol::error err = pfrResult;
+                        LOG_ERROR(err.what());
+                    }
+                }
+            }
         }
     };
 } // namespace Toy2D

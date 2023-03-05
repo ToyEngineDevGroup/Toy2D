@@ -22,6 +22,7 @@ namespace Toy2D {
         m_config_manager   = CreateScope<ConfigManager>();
         m_window           = CreateScope<WindowSystem>(WindowCreateInfo{});
         m_resource_manager = CreateScope<ResourceManager>();
+        m_lua_interpreter  = CreateScope<LuaInterpreter>();
 
         m_window->setEventCallback(BIND_EVENT_FN(Application::onEvent));
 

@@ -37,6 +37,7 @@ namespace Toy2D {
         template <typename T>
         void removeComponent() {
             ASSERT(hasComponent<T>(), "Entity does not have this component!");
+            m_parent_scene->onComponentErased(*this, getComponent<T>());
             m_parent_scene->m_registry.remove<T>(m_entity_handle);
         }
 
