@@ -3,6 +3,7 @@
 #include <sol/sol.hpp>
 
 #include "runtime/core/util/time_step.h"
+#include "runtime/function/physics/collider2d.h"
 #include "runtime/function/scene/scene_camera.h"
 #include "runtime/function/scene/scriptable_entity.h"
 #include "runtime/resource/resource/tile_sheet.h"
@@ -65,6 +66,7 @@ namespace Toy2D {
         SceneCamera camera;
         bool        is_current{true};
         bool        is_fixed_aspectRatio{false};
+        bool        is_fixed_rotation{true};
 
         CameraComponent()                       = default;
         CameraComponent(const CameraComponent&) = default;
@@ -130,4 +132,34 @@ namespace Toy2D {
             }
         }
     };
+
+    // physics
+    struct Rigidbody2DComponent {
+        enum class BodyType { Static = 0,
+                              Dynamic,
+                              Kinematic };
+
+        BodyType   type{BodyType::Static};
+        Collider2D collider;
+        // Shape and type is never mutable.
+
+        bool is_fixed_rotation{false};
+        bool is_mutable{true};
+        bool show_box{true};
+
+        Rigidbody2DComponent() = default;
+
+        // Storage for runtime
+        void* runtime_body{nullptr};
+
+        Vector2 linear_velocity{0.0f, 0.0f};
+        float   angular_velocity{0.0f};
+
+        Vector2 old_linear_velocity{0.0f, 0.0f};
+        float   old_angular_velocity{0.0f};
+
+        Vector2 old_translation{0.0f, 0.0f};
+        float   old_rotation{0.0f};
+    };
+
 } // namespace Toy2D

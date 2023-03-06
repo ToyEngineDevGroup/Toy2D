@@ -5,9 +5,14 @@ bin/
 lib/
 log/
 
+toy2d/source/sandbox
+
 toy2d/source/test
 
 docs/zeroengine-design/.obsidian
+
+.gitignore
+CMakeLists.txt
 
 zeroengine.log
 zero.log
