@@ -1,4 +1,5 @@
 #include "runtime/function/scripting/lua_interpreter.h"
+#include "runtime/function/scripting/lua_binder.h"
 
 namespace Toy2D {
     LuaInterpreter::LuaInterpreter() {
@@ -15,7 +16,7 @@ namespace Toy2D {
             m_luaState = CreateScope<sol::state>();
             m_luaState->open_libraries(sol::lib::base, sol::lib::math, sol::lib::string);
 
-            // TODO: bind all the stuff to luaState here
+            LuaBinder::callBinders(*m_luaState);
 
             m_isOk = true;
 

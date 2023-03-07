@@ -9,15 +9,7 @@ void ExampleLayer::onAttach() {
     Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::TileSheet>(
         Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tilesheet/player.json");
     Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
-        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/asoul_desc.json");
-    Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
-        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/bella_desc.json");
-    Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
         Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/box_desc.json");
-    Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
-        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/player_desc.json");
-    Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
-        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/money_desc.json");
 
     m_world.addScene("main").setActiveScene("main").onResize(
         Toy2D::Application::get().getWindow()->getWidth(),
@@ -27,9 +19,6 @@ void ExampleLayer::onAttach() {
     player.addComponent<Toy2D::CameraComponent>().camera.setOrthographicSize(5.0f);
     player.addComponent<Toy2D::TileComponent>(
         Toy2D::Application::get().getResourceMngr()->get<Toy2D::ResourceType::TileSheet>("player"));
-    {
-        auto& transform = player.getComponent<Toy2D::TransformComponent>();
-    }
     player.addComponent<Toy2D::NativeScriptComponent>().bind<PlayerController>();
     {
         auto& rigidbody             = player.addComponent<Toy2D::Rigidbody2DComponent>();
@@ -56,32 +45,6 @@ void ExampleLayer::onAttach() {
         transform.translation.x = -1.0f;
         transform.rotation.z    = 0.3f;
     }
-
-    int  money_count = 0;
-    auto addMoney    = [=](float x, float y) {
-        auto&& money = m_world.getActiveScene()->createEntity(std::format("money_{}", money_count));
-        {
-            auto& sprite     = money.addComponent<Toy2D::SpriteComponent>();
-            sprite.tex_index = Toy2D::Application::get().getResourceMngr()->index<Toy2D::ResourceType::Texture>("money");
-        }
-        {
-            auto& rigidbody               = money.addComponent<Toy2D::Rigidbody2DComponent>();
-            rigidbody.is_fixed_rotation   = true;
-            rigidbody.collider.is_trigger = true;
-            rigidbody.collider.createBox(0.1f, 0.1f);
-        }
-        {
-            auto& transform         = money.getComponent<Toy2D::TransformComponent>();
-            transform.translation.x = x;
-            transform.translation.y = y;
-            transform.scale.x       = 0.1;
-            transform.scale.y       = 0.1;
-        }
-    };
-
-    for (int i = 0; i < 10; ++i)
-        for (int j = 0; j < 10; ++j)
-            addMoney(i * 0.2 - 1.0, j * 0.2);
 
     auto&& tile = m_world.getActiveScene()->createEntity("tile");
     tile.addComponent<Toy2D::TileComponent>(
@@ -113,8 +76,7 @@ void ExampleLayer::onImGuiRender() {
         LOG_INFO("Button Clicked");
         });
 
-    if (g_player_money)
-        Toy2D::Widgets::drawText(std::format("Move with W,A,S,D. Have a try!!! [ Your money: {} ]", *g_player_money));
+    Toy2D::Widgets::drawText("Hello World");
 }
 
 void ExampleLayer::onEvent(Toy2D::Event& event) {
@@ -124,6 +86,5 @@ void ExampleLayer::onEvent(Toy2D::Event& event) {
 
 bool ExampleLayer::onWindowResizeEvent(Toy2D::WindowResizeEvent& event) {
     m_world.onResize(event.getWidth(), event.getHeight());
-
     return false;
 }

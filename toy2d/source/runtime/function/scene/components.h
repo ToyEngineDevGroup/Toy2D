@@ -90,6 +90,7 @@ namespace Toy2D {
     struct LuaScriptComponent {
         sol::table            object{sol::nil};
         std::filesystem::path script_path;
+        Entity                parent_entity;
 
         LuaScriptComponent()                          = default;
         LuaScriptComponent(const LuaScriptComponent&) = default;
@@ -107,6 +108,7 @@ namespace Toy2D {
             else {
                 if (result.return_count() == 1 && result[0].is<sol::table>()) {
                     object = result[0];
+                    // bind entity
                     return true;
                 }
                 else {

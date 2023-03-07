@@ -121,6 +121,8 @@ namespace Toy2D {
                 case Rigidbody2DComponent::BodyType::Kinematic:
                     is_kinematic = true;
                     break;
+                case Rigidbody2DComponent::BodyType::Static:
+                    break;
             }
             rigidbody2d.runtime_body = reinterpret_cast<void*>(m_physics2d_manager->createBody((uint32_t)entity, transform.translation.x, transform.translation.y, transform.rotation.z, is_dynamic, is_kinematic, rigidbody2d.is_fixed_rotation, rigidbody2d.collider));
         }
@@ -254,6 +256,7 @@ namespace Toy2D {
 
     template <>
     void Scene::onComponentAdded<LuaScriptComponent>(Entity entity, LuaScriptComponent& component) {
+        component.parent_entity = entity;
         Application::get().getLuaInterpreter()->consider(&component);
     }
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "runtime/pch.h"
-
 namespace Toy2D {
     class Physics2DManager;
     class ContactListener2D;
