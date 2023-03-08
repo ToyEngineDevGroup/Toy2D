@@ -18,14 +18,13 @@ void ExampleLayer::onAttach() {
 
     auto&& tile = m_world.getActiveScene()->createEntity("player");
     tile.addComponent<Toy2D::TileComponent>("player");
-    // tile.addComponent<Toy2D::NativeScriptComponent>().bind<AnimeScript>();
     tile.addComponent<Toy2D::LuaScriptComponent>(
         Toy2D::Application::get().getConfigMngr()->getScriptFolder() / "player_controller.lua");
 
-    m_world.getActiveScene()->getEntityByName("player").getComponent<Toy2D::TransformComponent>().translation.x = 1.0f;
-
     // Toy2D::SceneSerializer serializer(m_world.getActiveScene());
     // serializer.deserialize(Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "scene/scene.json");
+
+    m_world.onRuntimeStart();
 }
 
 void ExampleLayer::onDetach() {
