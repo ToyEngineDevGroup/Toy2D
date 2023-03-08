@@ -16,21 +16,7 @@ namespace Toy2D {
         struct ResLoader final {
             using res_type = Scope<Resource<ResourceType::TileSheet>>;
 
-            res_type operator()(const std::filesystem::path& path) const {
-                rapidjson::Document doc;
-                JsonSerialzer::deserialze(doc, path);
-                auto          tex_desc_path = std::filesystem::path(TOY2D_XSTR(ROOT_DIR)) / "asset" / doc["tex_desc_path"].GetString();
-                TileSheetDesc desc{
-                    tex_desc_path.string(),
-                    static_cast<uint16_t>(doc["row"].GetUint()),
-                    static_cast<uint16_t>(doc["col"].GetUint())};
-
-                return CreateScope<Resource<ResourceType::TileSheet>>(
-                    (doc.HasMember("name")) ?
-                        doc["name"].GetString() :
-                        tex_desc_path.stem().string(),
-                    desc);
-            }
+            res_type operator()(const std::filesystem::path& path) const;
         };
 
     public:
