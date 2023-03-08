@@ -16,7 +16,7 @@
 namespace Toy2D {
     class Application {
     public:
-        Application();
+        Application(const std::filesystem::path& game_root_path = {});
         virtual ~Application();
 
         void run();

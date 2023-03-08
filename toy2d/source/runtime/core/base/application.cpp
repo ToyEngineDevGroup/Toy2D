@@ -12,14 +12,14 @@ using namespace Chen::CDX12;
 namespace Toy2D {
     Application* Application::s_instance = nullptr;
 
-    Application::Application() {
+    Application::Application(const std::filesystem::path& game_root_path) {
         ASSERT(!s_instance, "Application already exists!");
         s_instance = this;
 
         Toy2D::LogSystem::init();
         LOG_INFO("toy2d start");
 
-        m_config_manager   = CreateScope<ConfigManager>();
+        m_config_manager   = CreateScope<ConfigManager>(game_root_path);
         m_window           = CreateScope<WindowSystem>(WindowCreateInfo{});
         m_resource_manager = CreateScope<ResourceManager>();
         m_lua_interpreter  = CreateScope<LuaInterpreter>();

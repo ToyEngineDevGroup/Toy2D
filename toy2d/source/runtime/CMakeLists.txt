@@ -15,7 +15,7 @@ target_include_directories(${TARGET_NAME} PUBLIC ${ROOT_DIR}/toy2d/source)
 
 target_precompile_headers(${TARGET_NAME} PUBLIC ${ROOT_DIR}/toy2d/source/runtime/pch.h)
 
-target_compile_definitions(${TARGET_NAME} PUBLIC ROOT_DIR=${CMAKE_SOURCE_DIR})
+target_compile_definitions(${TARGET_NAME} PUBLIC ROOT_DIR=${ROOT_DIR})
 
 find_package(RapidJSON CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
