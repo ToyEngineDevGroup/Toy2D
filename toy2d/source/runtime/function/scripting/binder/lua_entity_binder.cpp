@@ -10,7 +10,7 @@ namespace Toy2D {
             /* Methods */
             "GetName", &Entity::getName,
             "SetName", &Entity::setName,
-            // "GetParentScene", &Entity::getParentScene
+            "GetParentScene", &Entity::getParentScene,
 
             /* Components Getters */
             "GetTransform", &Entity::getComponent<TransformComponent>,

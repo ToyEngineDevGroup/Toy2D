@@ -12,8 +12,6 @@ set_target_properties(${TARGET_NAME} PROPERTIES
     CXX_STANDARD_REQUIRED ON
 )
 
-target_compile_definitions(${TARGET_NAME} PUBLIC ROOT_DIR=${CMAKE_SOURCE_DIR})
-
 target_include_directories(${TARGET_NAME}
     PUBLIC ${ROOT_DIR}/toy2d/source/scripting/include
     PUBLIC ${ROOT_DIR}/toy2d/source)

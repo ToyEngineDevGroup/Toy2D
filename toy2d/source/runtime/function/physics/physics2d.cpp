@@ -37,29 +37,29 @@ namespace Toy2D {
 
     void Physics2DManager::resetWorld() {
         b2Vec2 gravity(0.0f, -9.8f);
-        m_world = CreateScope<b2World>(gravity);
+        m_world            = CreateScope<b2World>(gravity);
         m_contact_listener = CreateScope<ContactListener2D>();
         m_world->SetContactListener(m_contact_listener.get());
     }
 
     b2Body* Physics2DManager::createBody(EntityIdType entity_id, float x, float y, float rotation, bool is_dynamic, bool is_kinematic, bool fixed_rotation, Collider2D& collider) {
         BodyDef bodydef;
-        bodydef.entity_id = entity_id;
-        bodydef.x         = x;
-        bodydef.y         = y;
-        bodydef.rotation  = rotation;
-        bodydef.is_dynamic = is_dynamic;
-        bodydef.is_kinematic = is_kinematic;
+        bodydef.entity_id     = entity_id;
+        bodydef.x             = x;
+        bodydef.y             = y;
+        bodydef.rotation      = rotation;
+        bodydef.is_dynamic    = is_dynamic;
+        bodydef.is_kinematic  = is_kinematic;
         bodydef.fixed_rotaion = fixed_rotation;
         bodydef.collider      = &collider;
         return createBody(bodydef);
-    }    
-    b2Body* Physics2DManager::createBody(BodyDef& bodydef) {    
+    }
+    b2Body* Physics2DManager::createBody(BodyDef& bodydef) {
         b2BodyDef b2_bodydef{};
         b2_bodydef.position.Set(bodydef.x, bodydef.y);
-        b2_bodydef.angle               = bodydef.rotation;
-        b2_bodydef.userData.pointer = reinterpret_cast<uintptr_t>(bodydef.collider);
-        b2_bodydef.fixedRotation       = bodydef.fixed_rotaion;
+        b2_bodydef.angle              = bodydef.rotation;
+        b2_bodydef.userData.pointer   = reinterpret_cast<uintptr_t>(bodydef.collider);
+        b2_bodydef.fixedRotation      = bodydef.fixed_rotaion;
         bodydef.collider->m_entity_id = bodydef.entity_id;
         b2FixtureDef b2_fixturedef{};
         ASSERT(bodydef.collider->m_b2shape.get() != nullptr, "You should create a shape for a rigidbody!");
@@ -118,6 +118,4 @@ namespace Toy2D {
         m_world->Step(0.01, 1, 1);
     }
 
-}
-
-
+} // namespace Toy2D
