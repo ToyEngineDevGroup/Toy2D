@@ -3,13 +3,20 @@ build-vs/
 build-clion/
 bin/
 lib/
+log/
+
+toy2d/source/sandbox
 
 docs/zeroengine-design/.obsidian
+
+.gitignore
+CMakeLists.txt
 
 zeroengine.log
 zero.log
 Zero.log
 imgui.ini
+docs/
 
 .vscode/
 .VSCodeCounter/

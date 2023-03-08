@@ -15,7 +15,7 @@ namespace Toy2D {
     */
 
     VertexBuffer::VertexBuffer(float* vertices, uint32_t byte_size) {
-        static VertexBufferLayout buffer_layout;
+        VertexBufferLayout buffer_layout;
 
         size_t             VERTEX_COUNT = byte_size / sizeof(float);
         std::vector<vbyte> vertex_data(byte_size);

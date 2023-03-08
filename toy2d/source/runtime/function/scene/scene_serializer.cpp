@@ -3,6 +3,7 @@
 #include <rapidjson/filewritestream.h>
 #include <rapidjson/writer.h>
 
+#include "runtime/core/util/json_serializer.h"
 #include "runtime/function/scene/components.h"
 #include "runtime/function/scene/entity.h"
 #include "runtime/function/scene/scene_serializer.h"
@@ -158,15 +159,7 @@ namespace Toy2D {
 
         doc.AddMember("Entities", entities, allocator);
 
-        FILE*   fp;
-        errno_t err = fopen_s(&fp, path.string().c_str(), "wb");
-
-        char                    writeBuffer[65536];
-        FileWriteStream         os(fp, writeBuffer, sizeof(writeBuffer));
-        Writer<FileWriteStream> write(os);
-        doc.Accept(write);
-
-        fclose(fp);
+        JsonSerialzer::serialze(doc, path);
     }
 
     void SceneSerializer::serializerRuntime(const std::filesystem::path& path) {
@@ -174,18 +167,8 @@ namespace Toy2D {
     }
 
     bool SceneSerializer::deserialize(const std::filesystem::path& path) {
-        if (!std::filesystem::exists(path)) {
-            LOG_WARN("The open_path doesn't exsit!");
-            return false;
-        }
-
-        FILE*          fp;
-        errno_t        err = fopen_s(&fp, path.string().c_str(), "rb");
-        char           readBuffer[65536];
-        FileReadStream is(fp, readBuffer, sizeof(readBuffer));
-
         Document document;
-        document.ParseStream(is);
+        JsonSerialzer::deserialze(document, path);
 
         if (!document.HasMember("Scene")) {
             LOG_WARN("Invalid Scene Json Format!");
@@ -269,7 +252,6 @@ namespace Toy2D {
             }
         }
 
-        fclose(fp);
         return true;
     }
 

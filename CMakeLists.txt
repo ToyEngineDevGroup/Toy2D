@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-set(ROOT_DIR ${CMAKE_SOURCE_DIR})
+set(ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 message(STATUS ${ROOT_DIR})
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -11,7 +11,7 @@ option(USE_VCPKG "use vcpkg or not" ON)
 
 if(USE_VCPKG)
     set(CMAKE_TOOLCHAIN_FILE $ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake CACHE STRING "")
-    set(VCPKG_TARGET_TRIPLET $ENV{VCPKG_DEFAULT_TRIPLET} CACHE STRING "")
+    set(VCPKG_TARGET_TRIPLET x64-windows CACHE STRING "")
 endif()
 
 set(CMAKE_CXX_STANDARD 20)
@@ -26,7 +26,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_CURRENT_LIST_DIR}/bin/
 
 project(Toy2D)
 
-add_definitions(-DUNICODE -D_UNICODE -DNOMINMAX -DGUID_WINDOWS)
+add_definitions(-DUNICODE -D_UNICODE -DNOMINMAX)
 
 if(MSVC)
     add_definitions(-D_USE_MATH_DEFINES)

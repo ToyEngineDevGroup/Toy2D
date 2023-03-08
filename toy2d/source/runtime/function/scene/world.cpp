@@ -60,4 +60,9 @@ namespace Toy2D {
         if (m_active_scene_indictor.has_value())
             m_scenes[m_active_scene_indictor.value()]->onUpdateRuntime(timestep);
     }
+
+    void World::onRuntimeStart() {
+        if (m_active_scene_indictor.has_value())
+            m_scenes[m_active_scene_indictor.value()]->onRuntimeStart();
+    }
 } // namespace Toy2D
