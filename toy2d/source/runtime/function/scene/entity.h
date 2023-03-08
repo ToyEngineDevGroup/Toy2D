@@ -37,6 +37,7 @@ namespace Toy2D {
         template <typename T>
         void removeComponent() {
             ASSERT(hasComponent<T>(), "Entity does not have this component!");
+            m_parent_scene->onComponentErased(*this, getComponent<T>());
             m_parent_scene->m_registry.remove<T>(m_entity_handle);
         }
 
@@ -51,6 +52,11 @@ namespace Toy2D {
         bool operator!=(const Entity& other) const {
             return !(*this == other);
         }
+
+        std::string getName();
+        void        setName(std::string_view name);
+
+        Scene* getParentScene() { return m_parent_scene; }
 
     private:
         entt::entity m_entity_handle{entt::null};

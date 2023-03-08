@@ -1,12 +1,10 @@
 #include "runtime/function/scene/scene.h"
+#include "runtime/core/base/application.h"
 #include "runtime/function/render/render_system/renderer_2d.h"
 #include "runtime/function/scene/components.h"
 #include "runtime/function/scene/entity.h"
 
 namespace Toy2D {
-    Scene::~Scene() {
-    }
-
     Entity Scene::createEntity(const std::string& name) {
         static uint32_t create_entity_count = 0;
 
@@ -26,17 +24,30 @@ namespace Toy2D {
     }
 
     void Scene::onRuntimeStart() {
+        // update lua scripts
         m_physics2d_manager = CreateScope<Physics2DManager>();
+
+        {
+            m_registry.view<LuaScriptComponent>().each([=](auto entity, LuaScriptComponent& lsc) {
+                lsc.luaCall("onCreate");
+            });
+        }
     }
 
     void Scene::onRuntimeStop() {
         m_physics2d_manager.reset();
+        // update lua scripts
+        {
+            m_registry.view<LuaScriptComponent>().each([=](auto entity, LuaScriptComponent& lsc) {
+                lsc.luaCall("onDestroy");
+            });
+        }
     }
 
     void Scene::onUpdateRuntime(TimeStep timestep) {
         // update scripts
         {
-            m_registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc) {
+            m_registry.view<NativeScriptComponent>().each([=](auto entity, NativeScriptComponent& nsc) {
                 if (!nsc.instance) {
                     nsc.instance           = nsc.instantiateScript();
                     nsc.instance->m_entity = Entity{entity, this};
@@ -44,6 +55,13 @@ namespace Toy2D {
                 }
 
                 nsc.instance->onUpdate(timestep);
+            });
+        }
+
+        // update lua scripts
+        {
+            m_registry.view<LuaScriptComponent>().each([=](auto entity, LuaScriptComponent& lsc) {
+                lsc.luaCall("onUpdate", timestep.getSeconds());
             });
         }
 
@@ -62,7 +80,7 @@ namespace Toy2D {
                 else {
                     transform_cam = transform;
                 }
-                
+
                 if (camera.is_current) {
                     curr_camera      = &camera.camera;
                     camera_transform = transform_cam.getTransform();
@@ -78,8 +96,7 @@ namespace Toy2D {
             for (auto entity : group) {
                 auto [transform, sprite] = group.get<TransformComponent, SpriteComponent>(entity);
 
-                    Renderer2D::drawSprite(transform.getTransform(), sprite, (int)entity);
-
+                Renderer2D::drawSprite(transform.getTransform(), sprite, (int)entity);
             }
 
             auto tile_group = m_registry.group<>(entt::get<TransformComponent, TileComponent>, entt::exclude<SpriteComponent>);
@@ -90,18 +107,18 @@ namespace Toy2D {
             }
         }
 
-        
-
         for (auto entity : m_submit_body_creation) {
-            bool is_dynamic = false, is_kinematic = false;
+            bool  is_dynamic = false, is_kinematic = false;
             auto& rigidbody2d = m_registry.get<Rigidbody2DComponent>(entity);
-            auto& transform = m_registry.get<TransformComponent>(entity);
+            auto& transform   = m_registry.get<TransformComponent>(entity);
             switch (rigidbody2d.type) {
                 case Rigidbody2DComponent::BodyType::Dynamic:
                     is_dynamic = true;
                     break;
                 case Rigidbody2DComponent::BodyType::Kinematic:
                     is_kinematic = true;
+                    break;
+                case Rigidbody2DComponent::BodyType::Static:
                     break;
             }
             rigidbody2d.runtime_body = reinterpret_cast<void*>(m_physics2d_manager->createBody((uint32_t)entity, transform.translation.x, transform.translation.y, transform.rotation.z, is_dynamic, is_kinematic, rigidbody2d.is_fixed_rotation, rigidbody2d.collider));
@@ -112,7 +129,7 @@ namespace Toy2D {
         for (auto entity : rigidbody2d_view) {
             auto& transform = m_registry.get<TransformComponent>(entity);
             auto& rigidbody = m_registry.get<Rigidbody2DComponent>(entity);
-              
+
             if (rigidbody.is_mutable) {
                 if (rigidbody.linear_velocity.x != rigidbody.old_linear_velocity.x || rigidbody.linear_velocity.y != rigidbody.old_linear_velocity.y || rigidbody.angular_velocity != rigidbody.old_angular_velocity) {
                     m_physics2d_manager->setVelocity(rigidbody.runtime_body, rigidbody.linear_velocity.x, rigidbody.linear_velocity.y, rigidbody.angular_velocity);
@@ -138,8 +155,8 @@ namespace Toy2D {
             }
             std::tie(rigidbody.old_linear_velocity.x, rigidbody.old_linear_velocity.y, rigidbody.old_angular_velocity) = m_physics2d_manager->getVelocity(rigidbody.runtime_body);
             std::tie(rigidbody.linear_velocity.x, rigidbody.linear_velocity.y, rigidbody.angular_velocity)             = std::make_tuple(rigidbody.old_linear_velocity.x, rigidbody.old_linear_velocity.y, rigidbody.old_angular_velocity);
-            std::tie(rigidbody.old_translation.x, rigidbody.old_translation.y, rigidbody.old_rotation)                 = m_physics2d_manager->getTransform(rigidbody.runtime_body);   
-            std::tie(transform.translation.x, transform.translation.y, transform.rotation.z)                           = std::make_tuple(rigidbody.old_translation.x, rigidbody.old_translation.y, rigidbody.old_rotation); 
+            std::tie(rigidbody.old_translation.x, rigidbody.old_translation.y, rigidbody.old_rotation)                 = m_physics2d_manager->getTransform(rigidbody.runtime_body);
+            std::tie(transform.translation.x, transform.translation.y, transform.rotation.z)                           = std::make_tuple(rigidbody.old_translation.x, rigidbody.old_translation.y, rigidbody.old_rotation);
             if (m_registry.all_of<NativeScriptComponent>(entity)) {
                 auto& nas = m_registry.get<NativeScriptComponent>(entity);
                 while (rigidbody.collider.hasCollisionEnterEvent()) {
@@ -147,6 +164,15 @@ namespace Toy2D {
                 }
                 while (rigidbody.collider.hasCollisionExitEvent()) {
                     nas.instance->onCollisionExit(Entity{(entt::entity)rigidbody.collider.getCollisionExitEvent(), this});
+                }
+            }
+            if (m_registry.all_of<LuaScriptComponent>(entity)) {
+                auto& lsc = m_registry.get<LuaScriptComponent>(entity);
+                while (rigidbody.collider.hasCollisionEnterEvent()) {
+                    lsc.luaCall("onCollisionEnter", Entity{(entt::entity)rigidbody.collider.getCollisionEnterEvent(), this});
+                }
+                while (rigidbody.collider.hasCollisionExitEvent()) {
+                    lsc.luaCall("onCollisionExit", Entity{(entt::entity)rigidbody.collider.getCollisionExitEvent(), this});
                 }
             }
         }
@@ -198,9 +224,20 @@ namespace Toy2D {
         return {};
     }
 
+    Entity Scene::getEntityByName(std::string_view _name) {
+        auto view = m_registry.view<NameComponent>();
+        for (auto entity : view) {
+            const auto& name = view.get<NameComponent>(entity);
+            if (name.name == std::string(_name))
+                return Entity{entity, this};
+        }
+        return {};
+    }
+
+    // ************************************************************************************************
+
     template <typename T>
     void Scene::onComponentAdded(Entity entity, T& component) {
-        // static_assert(false);
     }
 
     template <>
@@ -231,6 +268,51 @@ namespace Toy2D {
     template <>
     void Scene::onComponentAdded<Rigidbody2DComponent>(Entity entity, Rigidbody2DComponent& component) {
         m_submit_body_creation.push_back(entity);
+    }
+
+    template <>
+    void Scene::onComponentAdded<LuaScriptComponent>(Entity entity, LuaScriptComponent& component) {
+        component.parent_entity = entity;
+        Application::get().getLuaInterpreter()->consider(&component);
+    }
+
+    // ************************************************************************************************
+
+    template <typename T>
+    void Scene::onComponentErased(Entity entity, T& component) {
+    }
+
+    template <>
+    void Scene::onComponentErased<TransformComponent>(Entity entity, TransformComponent& component) {
+    }
+
+    template <>
+    void Scene::onComponentErased<CameraComponent>(Entity entity, CameraComponent& component) {
+    }
+
+    template <>
+    void Scene::onComponentErased<SpriteComponent>(Entity entity, SpriteComponent& component) {
+    }
+
+    template <>
+    void Scene::onComponentErased<TileComponent>(Entity entity, TileComponent& component) {
+    }
+
+    template <>
+    void Scene::onComponentErased<NameComponent>(Entity entity, NameComponent& component) {
+    }
+
+    template <>
+    void Scene::onComponentErased<NativeScriptComponent>(Entity entity, NativeScriptComponent& component) {
+    }
+
+    template <>
+    void Scene::onComponentErased<LuaScriptComponent>(Entity entity, LuaScriptComponent& component) {
+        Application::get().getLuaInterpreter()->unconsider(&component);
+    }
+
+    template <>
+    void Scene::onComponentErased<Rigidbody2DComponent>(Entity entity, Rigidbody2DComponent& component) {
     }
 
 } // namespace Toy2D

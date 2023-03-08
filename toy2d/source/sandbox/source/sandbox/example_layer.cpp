@@ -15,8 +15,6 @@ void ExampleLayer::onAttach() {
     Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
         Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/box_desc.json");
     Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
-        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/player_desc.json");
-    Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
         Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/money_desc.json");
 
     m_world.addScene("main").setActiveScene("main").onResize(
@@ -25,8 +23,7 @@ void ExampleLayer::onAttach() {
 
     auto&& player = m_world.getActiveScene()->createEntity("player");
     player.addComponent<Toy2D::CameraComponent>().camera.setOrthographicSize(5.0f);
-    player.addComponent<Toy2D::TileComponent>(
-        Toy2D::Application::get().getResourceMngr()->get<Toy2D::ResourceType::TileSheet>("player"));
+    player.addComponent<Toy2D::TileComponent>("player");
     {
         auto& transform = player.getComponent<Toy2D::TransformComponent>();
     }
@@ -58,7 +55,7 @@ void ExampleLayer::onAttach() {
     }
 
     int  money_count = 0;
-    auto addMoney = [=](float x, float y) {
+    auto addMoney    = [=](float x, float y) {
         auto&& money = m_world.getActiveScene()->createEntity(std::format("money_{}", money_count));
         {
             auto& sprite     = money.addComponent<Toy2D::SpriteComponent>();
@@ -81,12 +78,7 @@ void ExampleLayer::onAttach() {
 
     for (int i = 0; i < 10; ++i)
         for (int j = 0; j < 10; ++j)
-            addMoney(i*0.2-1.0, j*0.2);
-
-    auto&& tile = m_world.getActiveScene()->createEntity("tile");
-    tile.addComponent<Toy2D::TileComponent>(
-        Toy2D::Application::get().getResourceMngr()->get<Toy2D::ResourceType::TileSheet>("player"));
-    tile.addComponent<Toy2D::NativeScriptComponent>().bind<AnimeScript>();
+            addMoney(i * 0.2 - 1.0, j * 0.2);
 
     // Toy2D::SceneSerializer serializer(m_world.getActiveScene());
     // serializer.deserialize(Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "scene/scene.json");
@@ -110,7 +102,7 @@ void ExampleLayer::onImGuiRender() {
         []() {
         LOG_INFO("Button Clicked");
         });
-    
+
     if (g_player_money)
         Toy2D::Widgets::drawText(std::format("Move with W,A,S,D. Have a try!!! [ Your money: {} ]", *g_player_money));
 }

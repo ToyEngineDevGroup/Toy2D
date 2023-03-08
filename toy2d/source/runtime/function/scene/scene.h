@@ -3,8 +3,8 @@
 #include <entt/entt.hpp>
 
 #include "runtime/core/util/time_step.h"
+#include "runtime/function/physics/physics2d.h"
 #include "runtime/function/render/camera_system/editor_camera.h"
-#include <runtime/function/physics/physics2d.h>
 
 class b2World;
 
@@ -19,8 +19,8 @@ namespace Toy2D {
         friend class SceneSerializer;
 
     public:
-        Scene() = default;
-        ~Scene();
+        Scene()  = default;
+        ~Scene() = default;
 
         Entity createEntity(const std::string& name = std::string{});
         void   destroyEntity(Entity entity);
@@ -34,10 +34,14 @@ namespace Toy2D {
         void onViewportResize(uint32_t width, uint32_t height);
 
         Entity getPrimaryCameraEntity();
+        Entity getEntityByName(std::string_view _name);
 
     private:
         template <typename T>
         void onComponentAdded(Entity entity, T& component);
+
+        template <typename T>
+        void onComponentErased(Entity entity, T& component);
 
     private:
         entt::registry m_registry;

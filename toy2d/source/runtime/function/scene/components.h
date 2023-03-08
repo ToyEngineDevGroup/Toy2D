@@ -1,9 +1,11 @@
 #pragma once
 
+#include <sol/sol.hpp>
+
 #include "runtime/core/util/time_step.h"
+#include "runtime/function/physics/collider2d.h"
 #include "runtime/function/scene/scene_camera.h"
 #include "runtime/function/scene/scriptable_entity.h"
-#include "runtime/function/physics/collider2d.h"
 #include "runtime/resource/resource/tile_sheet.h"
 
 namespace Toy2D {
@@ -46,7 +48,7 @@ namespace Toy2D {
     };
 
     struct TileComponent {
-        Resource<ResourceType::TileSheet>* tile_sheet;
+        Resource<ResourceType::TileSheet>* tile_sheet{nullptr};
         uint32_t                           coord_x{0};
         uint32_t                           coord_y{0};
         uint32_t                           size_x{1};
@@ -56,8 +58,7 @@ namespace Toy2D {
 
         TileComponent()                     = default;
         TileComponent(const TileComponent&) = default;
-        TileComponent(Resource<ResourceType::TileSheet>* _tile_sheet) :
-            tile_sheet(_tile_sheet) {}
+        TileComponent(std::string_view tile_sheet);
     };
 
     struct CameraComponent {
@@ -85,22 +86,69 @@ namespace Toy2D {
         }
     };
 
+    struct LuaScriptComponent {
+        sol::table            object{sol::nil};
+        std::filesystem::path script_path;
+        Entity                parent_entity;
+
+        LuaScriptComponent()                          = default;
+        LuaScriptComponent(const LuaScriptComponent&) = default;
+        LuaScriptComponent(const std::filesystem::path& path) :
+            script_path(path) {}
+
+        bool registerToLuaContext(sol::state& p_luaState) {
+            auto result = p_luaState.safe_script_file(script_path.string(), &sol::script_pass_on_error);
+
+            if (!result.valid()) {
+                sol::error err = result;
+                LOG_ERROR(err.what());
+                return false;
+            }
+            else {
+                if (result.return_count() == 1 && result[0].is<sol::table>()) {
+                    object           = result[0];
+                    object["parent"] = parent_entity;
+                    return true;
+                }
+                else {
+                    LOG_ERROR("{} missing return expression", script_path.string());
+                    return false;
+                }
+            }
+        }
+
+        void unregisterFromLuaContext() { object = sol::nil; }
+
+        template <typename... Args>
+        void luaCall(const std::string& p_functionName, Args&&... p_args) {
+            if (object.valid()) {
+                if (object[p_functionName].valid()) {
+                    sol::protected_function pfr       = object[p_functionName];
+                    auto                    pfrResult = pfr.call(object, std::forward<Args>(p_args)...);
+                    if (!pfrResult.valid()) {
+                        sol::error err = pfrResult;
+                        LOG_ERROR(err.what());
+                    }
+                }
+            }
+        }
+    };
+
     // physics
     struct Rigidbody2DComponent {
         enum class BodyType { Static = 0,
                               Dynamic,
                               Kinematic };
 
-        BodyType type{BodyType::Static};
+        BodyType   type{BodyType::Static};
         Collider2D collider;
         // Shape and type is never mutable.
 
-        bool     is_fixed_rotation{false};
-        bool     is_mutable{true}; 
-        bool     show_box{true};
+        bool is_fixed_rotation{false};
+        bool is_mutable{true};
+        bool show_box{true};
 
-        Rigidbody2DComponent()                            = default;
-        Rigidbody2DComponent(const Rigidbody2DComponent&) = default;
+        Rigidbody2DComponent() = default;
 
         // Storage for runtime
         void* runtime_body{nullptr};
@@ -113,7 +161,6 @@ namespace Toy2D {
 
         Vector2 old_translation{0.0f, 0.0f};
         float   old_rotation{0.0f};
-
     };
 
 } // namespace Toy2D
