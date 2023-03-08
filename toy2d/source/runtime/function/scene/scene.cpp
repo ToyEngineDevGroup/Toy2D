@@ -166,6 +166,15 @@ namespace Toy2D {
                     nas.instance->onCollisionExit(Entity{(entt::entity)rigidbody.collider.getCollisionExitEvent(), this});
                 }
             }
+            if (m_registry.all_of<LuaScriptComponent>(entity)) {
+                auto& lsc = m_registry.get<LuaScriptComponent>(entity);
+                while (rigidbody.collider.hasCollisionEnterEvent()) {
+                    lsc.luaCall("onCollisionEnter", Entity{(entt::entity)rigidbody.collider.getCollisionEnterEvent(), this});
+                }
+                while (rigidbody.collider.hasCollisionExitEvent()) {
+                    lsc.luaCall("onCollisionExit", Entity{(entt::entity)rigidbody.collider.getCollisionExitEvent(), this});
+                }
+            }
         }
 
         Renderer2D::endScene();
