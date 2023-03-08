@@ -5,9 +5,6 @@
 #include "runtime/function/scene/entity.h"
 
 namespace Toy2D {
-    Scene::~Scene() {
-    }
-
     Entity Scene::createEntity(const std::string& name) {
         static uint32_t create_entity_count = 0;
 
@@ -218,6 +215,16 @@ namespace Toy2D {
         return {};
     }
 
+    Entity Scene::getEntityByName(std::string_view _name) {
+        auto view = m_registry.view<NameComponent>();
+        for (auto entity : view) {
+            const auto& name = view.get<NameComponent>(entity);
+            if (name.name == std::string(_name))
+                return Entity{entity, this};
+        }
+        return {};
+    }
+
     // ************************************************************************************************
 
     template <typename T>
@@ -293,6 +300,10 @@ namespace Toy2D {
     template <>
     void Scene::onComponentErased<LuaScriptComponent>(Entity entity, LuaScriptComponent& component) {
         Application::get().getLuaInterpreter()->unconsider(&component);
+    }
+
+    template <>
+    void Scene::onComponentErased<Rigidbody2DComponent>(Entity entity, Rigidbody2DComponent& component) {
     }
 
 } // namespace Toy2D

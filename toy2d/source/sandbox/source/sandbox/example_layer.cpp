@@ -15,8 +15,6 @@ void ExampleLayer::onAttach() {
     Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
         Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/box_desc.json");
     Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
-        Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/player_desc.json");
-    Toy2D::Application::get().getResourceMngr()->add<Toy2D::ResourceType::Texture>(
         Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/money_desc.json");
 
     m_world.addScene("main").setActiveScene("main").onResize(
@@ -25,8 +23,7 @@ void ExampleLayer::onAttach() {
 
     auto&& player = m_world.getActiveScene()->createEntity("player");
     player.addComponent<Toy2D::CameraComponent>().camera.setOrthographicSize(5.0f);
-    player.addComponent<Toy2D::TileComponent>(
-        Toy2D::Application::get().getResourceMngr()->get<Toy2D::ResourceType::TileSheet>("player"));
+    player.addComponent<Toy2D::TileComponent>("player");
     {
         auto& transform = player.getComponent<Toy2D::TransformComponent>();
     }
@@ -82,13 +79,6 @@ void ExampleLayer::onAttach() {
     for (int i = 0; i < 10; ++i)
         for (int j = 0; j < 10; ++j)
             addMoney(i * 0.2 - 1.0, j * 0.2);
-
-    auto&& tile = m_world.getActiveScene()->createEntity("tile");
-    tile.addComponent<Toy2D::TileComponent>(
-        Toy2D::Application::get().getResourceMngr()->get<Toy2D::ResourceType::TileSheet>("player"));
-    tile.addComponent<Toy2D::NativeScriptComponent>().bind<AnimeScript>();
-    tile.addComponent<Toy2D::LuaScriptComponent>(
-        Toy2D::Application::get().getConfigMngr()->getScriptFolder() / "player_controller.lua");
 
     // Toy2D::SceneSerializer serializer(m_world.getActiveScene());
     // serializer.deserialize(Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "scene/scene.json");

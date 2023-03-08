@@ -1,8 +1,6 @@
 #include "sandbox/example_layer.h"
 #include "sandbox/scripts.h"
 
-int* g_player_money = nullptr;
-
 void ExampleLayer::onAttach() {
     LOG_TRACE("attach");
 
@@ -15,43 +13,16 @@ void ExampleLayer::onAttach() {
         Toy2D::Application::get().getWindow()->getWidth(),
         Toy2D::Application::get().getWindow()->getHeight());
 
-    auto&& player = m_world.getActiveScene()->createEntity("player");
-    player.addComponent<Toy2D::CameraComponent>().camera.setOrthographicSize(5.0f);
-    player.addComponent<Toy2D::TileComponent>(
-        Toy2D::Application::get().getResourceMngr()->get<Toy2D::ResourceType::TileSheet>("player"));
-    player.addComponent<Toy2D::NativeScriptComponent>().bind<PlayerController>();
-    {
-        auto& rigidbody             = player.addComponent<Toy2D::Rigidbody2DComponent>();
-        rigidbody.type              = Toy2D::Rigidbody2DComponent::BodyType::Dynamic;
-        rigidbody.is_fixed_rotation = true;
-        rigidbody.collider.createBox(0.5f, 0.5f);
-    }
+    auto&& camera = m_world.getActiveScene()->createEntity("camera");
+    camera.addComponent<Toy2D::CameraComponent>().camera.setOrthographicSize(3.0f);
 
-    auto&& square = m_world.getActiveScene()->createEntity("square");
-    square.addComponent<Toy2D::SpriteComponent>();
-    square.addComponent<Toy2D::Rigidbody2DComponent>().collider.createBox(1.0f, 1.0f);
-    {
-        auto& transform         = square.getComponent<Toy2D::TransformComponent>();
-        transform.translation.y = -1.5f;
-        transform.rotation.z    = 0.3f;
-    }
-
-    auto&& another_square = m_world.getActiveScene()->createEntity("another_square");
-    another_square.addComponent<Toy2D::SpriteComponent>();
-    another_square.addComponent<Toy2D::Rigidbody2DComponent>().collider.createBox(1.0f, 1.0f);
-    {
-        auto& transform         = another_square.getComponent<Toy2D::TransformComponent>();
-        transform.translation.y = -1.5f;
-        transform.translation.x = -1.0f;
-        transform.rotation.z    = 0.3f;
-    }
-
-    auto&& tile = m_world.getActiveScene()->createEntity("tile");
-    tile.addComponent<Toy2D::TileComponent>(
-        Toy2D::Application::get().getResourceMngr()->get<Toy2D::ResourceType::TileSheet>("player"));
-    tile.addComponent<Toy2D::NativeScriptComponent>().bind<AnimeScript>();
+    auto&& tile = m_world.getActiveScene()->createEntity("player");
+    tile.addComponent<Toy2D::TileComponent>("player");
+    // tile.addComponent<Toy2D::NativeScriptComponent>().bind<AnimeScript>();
     tile.addComponent<Toy2D::LuaScriptComponent>(
         Toy2D::Application::get().getConfigMngr()->getScriptFolder() / "player_controller.lua");
+
+    m_world.getActiveScene()->getEntityByName("player").getComponent<Toy2D::TransformComponent>().translation.x = 1.0f;
 
     // Toy2D::SceneSerializer serializer(m_world.getActiveScene());
     // serializer.deserialize(Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "scene/scene.json");

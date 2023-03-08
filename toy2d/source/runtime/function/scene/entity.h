@@ -53,6 +53,11 @@ namespace Toy2D {
             return !(*this == other);
         }
 
+        std::string getName();
+        void        setName(std::string_view name);
+
+        Scene* getParentScene() { return m_parent_scene; }
+
     private:
         entt::entity m_entity_handle{entt::null};
         Scene*       m_parent_scene;

@@ -48,7 +48,7 @@ namespace Toy2D {
     };
 
     struct TileComponent {
-        Resource<ResourceType::TileSheet>* tile_sheet;
+        Resource<ResourceType::TileSheet>* tile_sheet{nullptr};
         uint32_t                           coord_x{0};
         uint32_t                           coord_y{0};
         uint32_t                           size_x{1};
@@ -58,8 +58,7 @@ namespace Toy2D {
 
         TileComponent()                     = default;
         TileComponent(const TileComponent&) = default;
-        TileComponent(Resource<ResourceType::TileSheet>* _tile_sheet) :
-            tile_sheet(_tile_sheet) {}
+        TileComponent(std::string_view tile_sheet);
     };
 
     struct CameraComponent {
@@ -107,8 +106,8 @@ namespace Toy2D {
             }
             else {
                 if (result.return_count() == 1 && result[0].is<sol::table>()) {
-                    object = result[0];
-                    // bind entity
+                    object           = result[0];
+                    object["parent"] = parent_entity;
                     return true;
                 }
                 else {

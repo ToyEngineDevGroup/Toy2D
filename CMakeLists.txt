@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-set(ROOT_DIR ${CMAKE_SOURCE_DIR})
+set(ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 message(STATUS ${ROOT_DIR})
 
 if(NOT CMAKE_BUILD_TYPE)

@@ -110,6 +110,35 @@ namespace Toy2D {
             "SmoothStep", [](const Vector4& v1, const Vector4& v2, float t) -> Vector4 { Vector4 ret; v1.SmoothStep(v1, v2, t, ret); return ret; },
             "Distance", [](const Vector4& v1, const Vector4& v2) -> float { return Vector4::Distance(v1, v2); });
 
+        /* Color */
+        p_luaState.new_usertype<Color>(
+            "Color",
+
+            /* Constructors */
+            sol::constructors<
+                Color(),
+                Color(float, float, float, float)>(),
+
+            /* Operators */
+            sol::meta_function::addition, [](const Color& lhs, const Color& rhs) -> Color { return lhs + rhs; },
+            sol::meta_function::subtraction, [](const Color& lhs, const Color& rhs) -> Color { return lhs - rhs; },
+            sol::meta_function::unary_minus, sol::resolve<Color() const>(&Color::operator-),
+            sol::meta_function::multiplication, [](const Color& lhs, const Color& rhs) -> Color { return lhs * rhs; },
+            sol::meta_function::division, [](const Color& lhs, const Color& rhs) -> Color { Color tmp(lhs); return tmp / rhs; },
+            sol::meta_function::to_string, [](const Color& target) { return "(" + std::to_string(target.x) + "," + std::to_string(target.y) + "," + std::to_string(target.z) + "," + std::to_string(target.w) + "}"; },
+
+            /* Variables */
+            "r", &Color::x,
+            "g", &Color::y,
+            "b", &Color::z,
+            "a", &Color::w,
+
+            /* Methods */
+            "AdjustContrast", [](Color& color, float contrast) { color.AdjustContrast(contrast); },
+            "AdjustSaturation", [](Color& color, float sat) { color.AdjustSaturation(sat); },
+            "Premultiply", [](const Color& c1, const Color& c2) -> Color { Color tmp(c2); c1.Premultiply(tmp); return tmp; },
+            "Modulate", [](const Color& c1, const Color& c2) -> Color { Color tmp; c1.Modulate(c1, c2, tmp); return tmp; });
+
         /* Matrix(4x4) */
         p_luaState.new_usertype<Matrix>(
             "Matrix",
