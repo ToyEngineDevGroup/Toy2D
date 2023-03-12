@@ -6,6 +6,12 @@ namespace Toy2D {
     class Physics2DManager {
     public:
         Physics2DManager();
+
+        void setGravity(const Vector2& g) {
+            m_gravity = g;
+            resetWorld();
+        }
+
         void    resetWorld();
         b2Body* createBody(EntityIdType entity_id, float x, float y, float rotation, bool is_dynamic, bool is_kinematic, bool fixed_rotaion, Collider2D& collider);
 
@@ -32,5 +38,7 @@ namespace Toy2D {
     private:
         Scope<b2World>           m_world;
         Scope<ContactListener2D> m_contact_listener;
+
+        Vector2 m_gravity;
     };
 } // namespace Toy2D
