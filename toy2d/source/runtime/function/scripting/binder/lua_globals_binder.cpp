@@ -22,7 +22,7 @@ namespace Toy2D {
             "GetPrimaryCameraEntity", [](Scene& scene) -> Entity { return scene.getPrimaryCameraEntity(); },
             "GetEntityByName", [](Scene& scene, std::string_view name) -> Entity { return scene.getEntityByName(name); },
             "CreateEntity", &Scene::createEntity,
-            "destroyEntity", &Scene::destroyEntity);
+            "DestroyEntity", &Scene::destroyEntity);
 
         p_luaState.create_named_table("Debug");
         p_luaState.create_named_table("Input");
