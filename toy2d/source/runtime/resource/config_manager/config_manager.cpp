@@ -3,6 +3,7 @@
 namespace Toy2D {
     ConfigManager::ConfigManager(const std::filesystem::path& game_root_path) {
         m_root_folder   = std::filesystem::path(TOY2D_XSTR(ROOT_DIR));
+
         m_asset_folder  = m_root_folder / "asset";
         m_script_folder = m_root_folder / "script";
 

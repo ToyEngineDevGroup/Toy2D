@@ -25,6 +25,13 @@ void ExampleLayer::onAttach() {
     player.addComponent<Toy2D::CameraComponent>().camera.setOrthographicSize(5.0f);
     player.addComponent<Toy2D::TileComponent>("player");
     {
+        auto& audio = player.addComponent<Toy2D::AudioComponent>();
+        Toy2D::WaveAudioData* wd    = new Toy2D::WaveAudioData();
+        wd->loadFromFile((char*)(Toy2D::Application::get().getConfigMngr()->getAssetFolder() / "audio/untitled.wav").u8string().c_str());
+        audio.instance = Toy2D::Application::get().getAudioMngr()->createInstance(wd);
+        audio.instance->play(true);
+    }
+    {
         auto& transform = player.getComponent<Toy2D::TransformComponent>();
     }
     player.addComponent<Toy2D::NativeScriptComponent>().bind<PlayerController>();

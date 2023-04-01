@@ -12,6 +12,8 @@
 #include <DirectXCollision.h>
 #include <DirectXColors.h>
 #include <DirectXPackedVector.h>
+#include <mmsystem.h>
+#include <dsound.h>
 #include <d3d12.h>
 #include <dxgi1_4.h>
 #include <dxgi1_6.h>
@@ -26,6 +28,7 @@
 #include <memory>
 #include <span>
 #include <utility>
+#include <thread>
 
 #include <array>
 #include <fstream>

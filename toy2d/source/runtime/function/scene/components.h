@@ -7,6 +7,7 @@
 #include "runtime/function/scene/scene_camera.h"
 #include "runtime/function/scene/scriptable_entity.h"
 #include "runtime/resource/resource/tile_sheet.h"
+#include "runtime/function/audio/audio_instance.h"
 
 namespace Toy2D {
     struct NameComponent {
@@ -145,6 +146,8 @@ namespace Toy2D {
         // Shape and type is never mutable.
 
         bool is_fixed_rotation{false};
+        unsigned int mask_bits{1};
+        unsigned int category_bits{1};
         bool is_mutable{true};
         bool show_box{true};
 
@@ -161,6 +164,17 @@ namespace Toy2D {
 
         Vector2 old_translation{0.0f, 0.0f};
         float   old_rotation{0.0f};
+    };
+
+    // audio
+    struct AudioComponent {
+        AudioComponent() = default;
+        AudioInstance* instance;
+    };
+
+    struct RemovedMarkComponent {
+        RemovedMarkComponent() = default;
+        int a;
     };
 
 } // namespace Toy2D

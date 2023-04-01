@@ -8,6 +8,7 @@
 #include "runtime/function/event/mouse_event.h"
 #include "runtime/function/gui/imgui_layer.h"
 #include "runtime/function/render/window_system/window_system.h"
+#include "runtime/function/audio/audio_manager.h"
 #include "runtime/function/scripting/lua_interpreter.h"
 
 #include "runtime/resource/config_manager/config_manager.h"
@@ -31,6 +32,7 @@ namespace Toy2D {
         WindowSystem*    getWindow() { return m_window.get(); }
         ResourceManager* getResourceMngr() { return m_resource_manager.get(); }
         ConfigManager*   getConfigMngr() { return m_config_manager.get(); }
+        AudioManager*    getAudioMngr() { return m_audio_manager.get(); }
         ImGuiLayer*      getImGuiLayer() { return m_ImGuiLayer; }
         LuaInterpreter*  getLuaInterpreter() { return m_lua_interpreter.get(); }
 
@@ -44,6 +46,7 @@ namespace Toy2D {
         Scope<WindowSystem>    m_window;
         Scope<ResourceManager> m_resource_manager;
         Scope<ConfigManager>   m_config_manager;
+        Scope<AudioManager>    m_audio_manager;
         Scope<LuaInterpreter>  m_lua_interpreter;
         ImGuiLayer*            m_ImGuiLayer;
 
