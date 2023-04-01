@@ -66,11 +66,9 @@ namespace Toy2D {
     void Physics2DManager::resetWorld() {
         b2Vec2 gravity(m_gravity.x, m_gravity.y);
         m_world.reset();
-        //m_contact_listener.reset();
         m_world            = CreateScope<b2World>(gravity);
         m_contact_listener = CreateScope<ContactListener2D>();
         m_world->SetContactListener(m_contact_listener.get());
-        //m_contact_filter.reset();
         m_contact_filter = CreateScope<ContactFilter2D>();
         m_world->SetContactFilter(m_contact_filter.get());
     }

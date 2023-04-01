@@ -12,7 +12,7 @@ namespace Toy2D {
             resetWorld();
         }
 
-        void resetWorld();
+        void    resetWorld();
 
         struct BodyDef {
             EntityIdType entity_id;
@@ -41,6 +41,7 @@ namespace Toy2D {
         Scope<b2World>           m_world;
         Scope<ContactListener2D> m_contact_listener;
         Scope<ContactFilter2D>   m_contact_filter;
+
 
         Vector2 m_gravity;
     };

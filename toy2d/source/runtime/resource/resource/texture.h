@@ -29,29 +29,9 @@ namespace Toy2D {
         struct ResLoader final {
             using res_type = Scope<Resource<ResourceType::Texture>>;
 
-            res_type operator()(const std::filesystem::path& path) const {
-                rapidjson::Document doc;
-                JsonSerialzer::deserialze(doc, path);
-                auto        res_path = (std::filesystem::path(TOY2D_XSTR(ROOT_DIR)) / "asset" / doc["path"].GetString());
-                TextureDesc desc{
-                    res_path.string(),
-                    (doc["is_wip"].GetBool()) ? TexFileFormat::WIC : TexFileFormat::DDS};
+            res_type operator()(const std::filesystem::path& path) const;
 
-                return CreateScope<Resource<ResourceType::Texture>>(
-                    (doc.HasMember("name")) ? doc["name"].GetString() : res_path.stem().string(),
-                    desc);
-            }
-
-            res_type operator()(std::string_view name, const std::filesystem::path& path) const {
-                rapidjson::Document doc;
-                JsonSerialzer::deserialze(doc, path);
-                auto        res_path = (std::filesystem::path(TOY2D_XSTR(ROOT_DIR)) / "asset" / doc["path"].GetString());
-                TextureDesc desc{
-                    res_path.string(),
-                    (doc["is_wip"].GetBool()) ? TexFileFormat::WIC : TexFileFormat::DDS};
-
-                return CreateScope<Resource<ResourceType::Texture>>(name, desc);
-            }
+            res_type operator()(std::string_view name, const std::filesystem::path& path) const;
         };
 
     public:

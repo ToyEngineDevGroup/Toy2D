@@ -3,6 +3,24 @@
 #include "runtime/function/render/render_system/buffer.h"
 
 namespace Toy2D {
+    Resource<ResourceType::TileSheet>::ResLoader::res_type Resource<ResourceType::TileSheet>::ResLoader::operator()(const std::filesystem::path& path) const {
+        rapidjson::Document doc;
+        JsonSerialzer::deserialze(doc, path);
+        auto          tex_desc_path = (doc.HasMember("is_engine_internel") && doc["is_engine_internel"].GetBool()) ?
+                                          Application::get().getConfigMngr()->getAssetFolder() / doc["tex_desc_path"].GetString() :
+                                          Application::get().getConfigMngr()->getGameAssetFolder() / doc["tex_desc_path"].GetString();
+        TileSheetDesc desc{
+            tex_desc_path.string(),
+            static_cast<uint16_t>(doc["row"].GetUint()),
+            static_cast<uint16_t>(doc["col"].GetUint())};
+
+        return CreateScope<Resource<ResourceType::TileSheet>>(
+            (doc.HasMember("name")) ?
+                doc["name"].GetString() :
+                tex_desc_path.stem().string(),
+            desc);
+    }
+
     Resource<ResourceType::TileSheet>::Resource(std::string_view name) :
         IResource(name) {
     }
