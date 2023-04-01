@@ -3,7 +3,7 @@
 namespace Toy2D {
     class ConfigManager {
     public:
-        ConfigManager();
+        explicit ConfigManager(const std::filesystem::path& game_root_path);
 
         const std::filesystem::path& getRootFolder() const;
         const std::filesystem::path& getAssetFolder() const;
