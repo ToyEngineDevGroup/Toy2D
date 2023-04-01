@@ -56,6 +56,8 @@ namespace Toy2D {
         std::string getName();
         void        setName(std::string_view name);
 
+        void        remove();
+
         Scene* getParentScene() { return m_parent_scene; }
 
     private:

@@ -3,12 +3,15 @@
 namespace Toy2D {
     class Physics2DManager;
     class ContactListener2D;
+    class ContactFilter2D;
     class Collider2D {
     public:
         friend class Physics2DManager;
         friend class ContactListener2D;
         Collider2D();
+        ~Collider2D();
         void createBox(float w, float h);
+        void createCircle(float r);
 
         float getBoxWidth();
         float getBoxHeight();
@@ -22,6 +25,7 @@ namespace Toy2D {
         bool stayWith(EntityIdType e);
         bool is_one_sided_collision{false};
         bool is_trigger{false};
+        bool enable{true};
 
     private:
         Scope<b2Shape>         m_b2shape;

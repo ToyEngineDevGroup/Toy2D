@@ -5,12 +5,22 @@ namespace Toy2D {
     Collider2D::Collider2D() {
     }
 
+    Collider2D::~Collider2D() {
+    }
+
     void Collider2D::createBox(float w, float h) {
         Scope<b2PolygonShape> b2shape = CreateScope<b2PolygonShape>();
         b2shape->SetAsBox(w / 2, h / 2);
         m_size.rect.w = w;
         m_size.rect.h = h;
         m_b2shape = std::move(b2shape);
+    }
+
+    void Collider2D::createCircle(float r) {
+        Scope<b2CircleShape> b2shape = CreateScope<b2CircleShape>();
+        b2shape->m_radius            = r;
+        m_size.circle.r              = r;
+        m_b2shape     = std::move(b2shape);
     }
 
     float Collider2D::getBoxWidth() {
@@ -43,10 +53,7 @@ namespace Toy2D {
     EntityIdType Collider2D::getCollisionExitEvent() {
         EntityIdType e = *m_collision_exit_event.begin();
         m_collision_exit_event.erase(m_collision_exit_event.begin());
-        auto e_in_stay  = m_collision_stay_event.find(e);
-        if (e_in_stay != m_collision_stay_event.end()) {
-            m_collision_stay_event.erase(e_in_stay);
-        }
+        m_collision_stay_event.erase(e);
         return e;
     }
 

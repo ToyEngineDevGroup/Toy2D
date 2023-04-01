@@ -14,4 +14,8 @@ namespace Toy2D {
         getComponent<NameComponent>().name = name.empty() ? "UnNamed_Entity" : std::string(name);
     }
 
+    void Entity::remove() {
+        addComponent<RemovedMarkComponent>();
+    }
+
 } // namespace Toy2D

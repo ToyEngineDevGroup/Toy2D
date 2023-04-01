@@ -36,6 +36,8 @@ namespace Toy2D {
         Entity getPrimaryCameraEntity();
         Entity getEntityByName(std::string_view _name);
 
+        void setGravity(const Vector2& g) { m_physics2d_manager->setGravity(g); }
+
     private:
         template <typename T>
         void onComponentAdded(Entity entity, T& component);

@@ -121,7 +121,18 @@ namespace Toy2D {
                 case Rigidbody2DComponent::BodyType::Static:
                     break;
             }
-            rigidbody2d.runtime_body = reinterpret_cast<void*>(m_physics2d_manager->createBody((uint32_t)entity, transform.translation.x, transform.translation.y, transform.rotation.z, is_dynamic, is_kinematic, rigidbody2d.is_fixed_rotation, rigidbody2d.collider));
+            Physics2DManager::BodyDef bdef;
+            bdef.x                   = transform.translation.x;
+            bdef.y                   = transform.translation.y;
+            bdef.rotation            = transform.rotation.z;
+            bdef.collider            = &rigidbody2d.collider;
+            bdef.is_dynamic          = rigidbody2d.type == Rigidbody2DComponent::BodyType::Dynamic;
+            bdef.is_kinematic        = rigidbody2d.type == Rigidbody2DComponent::BodyType::Kinematic;
+            bdef.entity_id           = static_cast<EntityIdType>(entity);
+            bdef.fixed_rotaion       = rigidbody2d.is_fixed_rotation;
+            bdef.mask_bits           = rigidbody2d.mask_bits;
+            bdef.category_bits       = rigidbody2d.category_bits;
+            rigidbody2d.runtime_body = reinterpret_cast<void*>(m_physics2d_manager->createBody(bdef));
         }
         m_submit_body_creation.clear();
 
@@ -139,7 +150,7 @@ namespace Toy2D {
                 }
             }
         }
-        m_physics2d_manager->update();
+        m_physics2d_manager->update(timestep);
         for (auto entity : rigidbody2d_view) {
             auto& transform = m_registry.get<TransformComponent>(entity);
             auto& rigidbody = m_registry.get<Rigidbody2DComponent>(entity);
@@ -178,6 +189,16 @@ namespace Toy2D {
         }
 
         Renderer2D::endScene();
+
+        auto remove_view = m_registry.view<RemovedMarkComponent>();
+        for (auto entity : remove_view) {
+            Entity en = Entity{entity, this};
+            if (en.hasComponent<SpriteComponent>()) en.removeComponent<SpriteComponent>();
+            if (en.hasComponent<Rigidbody2DComponent>()) en.removeComponent<Rigidbody2DComponent>();
+            if (en.hasComponent<AudioComponent>()) en.removeComponent<AudioComponent>();
+            if (en.hasComponent<LuaScriptComponent>()) en.removeComponent<LuaScriptComponent>();
+        }
+
     }
 
     void Scene::onUpdateEditor(TimeStep timestep, EditorCamera& camera) {
@@ -276,6 +297,15 @@ namespace Toy2D {
         Application::get().getLuaInterpreter()->consider(&component);
     }
 
+    template <>
+    void Scene::onComponentAdded<AudioComponent>(Entity entity, AudioComponent& component) {
+        
+    }
+
+    template <>
+    void Scene::onComponentAdded<RemovedMarkComponent>(Entity entity, RemovedMarkComponent& component) {
+    }
+
     // ************************************************************************************************
 
     template <typename T>
@@ -313,6 +343,16 @@ namespace Toy2D {
 
     template <>
     void Scene::onComponentErased<Rigidbody2DComponent>(Entity entity, Rigidbody2DComponent& component) {
+        m_physics2d_manager->deleteBody(component.runtime_body);
     }
 
+    template <>
+    void Scene::onComponentErased<AudioComponent>(Entity entity, AudioComponent& component) {
+        delete component.instance;
+    }
+
+    template <>
+    void Scene::onComponentErased<RemovedMarkComponent>(Entity entity, RemovedMarkComponent& component) {
+        
+    }
 } // namespace Toy2D
